@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.OroiApp" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Gaiari esaten diogu nola margotu DatePickerDialog-a -->
+        <item name="android:datePickerDialogTheme">@style/OroiDatePickerDialogTheme</item>
+    </style>
+
+    <!-- DatePickerDialog-aren gai pertsonalizatua MODU ARGIRAKO -->
+    <style name="OroiDatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog">
+        <!-- Honek goiburukoa eta hautatutako eguna koloreztatuko ditu -->
+        <item name="android:colorAccent">@color/oroi_primary_light</item>
+        <!-- Hautatutako egunaren zenbakia zuriz jarri -->
+        <item name="android:textColorPrimaryInverse">@color/white</item>
+    </style>
+</resources>
