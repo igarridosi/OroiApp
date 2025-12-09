@@ -49,6 +49,8 @@ import com.example.oroiapp.viewmodel.MainViewModel
 import com.example.oroiapp.viewmodel.SubscriptionFilter
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun MainHeader(username: String) {
@@ -250,22 +252,40 @@ fun FilterChipRow(
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ALFABETIKOA,
             onClick = { onFilterSelected(SubscriptionFilter.ALFABETIKOA) },
-            label = { Text("Alfabetikoa") }
+            label = { Text("Alfabetikoa") },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                selectedLabelColor = MaterialTheme.colorScheme.surface,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                labelColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ORDAINKETA_DATA,
             onClick = { onFilterSelected(SubscriptionFilter.ORDAINKETA_DATA) },
-            label = { Text("Ordainketa") }
+            label = { Text("Ordainketa Data") },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                selectedLabelColor = MaterialTheme.colorScheme.surface,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                labelColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
         FilterChip(
             selected = currentFilter == SubscriptionFilter.PREZIOA,
             onClick = { onFilterSelected(SubscriptionFilter.PREZIOA) },
-            label = { Text("Prezioa") }
+            label = { Text("Prezioa") },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                selectedLabelColor = MaterialTheme.colorScheme.surface,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                labelColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SubscriptionList(
     subscriptions: List<Subscription>,
@@ -300,7 +320,18 @@ fun SubscriptionList(
             }
         }
     } else {
+        // Zerrendaren egoera (scroll-a) kontrolatzeko aldagaia sortu
+        val listState = rememberLazyListState()
+
+        // 'subscriptions' zerrenda aldatzen den bakoitzean (filtroa aldatzean), kode hau exekutatuko da.
+        LaunchedEffect(subscriptions) {
+            // Zerrendaren hasierara joango da
+            listState.scrollToItem(0)
+        }
+
         LazyColumn(
+            // Sortu dugun egoera LazyColumn-ari esleitu
+            state = listState,
             // Padding-a elementu bakoitzari emango diogu, ez zerrendari
             verticalArrangement = Arrangement.spacedBy(8.dp),
 
@@ -326,7 +357,9 @@ fun SubscriptionList(
                 )
                 SwipeToDismissBox(
                     state = dismissState,
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .animateItem(),
                     enableDismissFromStartToEnd = true,
                     enableDismissFromEndToStart = true,
                     backgroundContent = {
