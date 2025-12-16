@@ -33,7 +33,10 @@ private val DarkColorScheme = darkColorScheme(
 
     onTertiary = MoreaIluna,
     onTertiaryContainer = MoreaArroxa,
-    onSecondary = Grisa
+    onSecondary = Grisa,
+
+    onTertiaryFixed = MoreaArgia,
+    onSecondaryFixed = MoreaArgia
 )
 
 // --- MODU ARGIRAKO PALETA ---
@@ -53,7 +56,10 @@ private val LightColorScheme = lightColorScheme(
 
     onTertiary = Grisa,
     onTertiaryContainer = MoreaIluna,
-    onSecondary = MoreaDistiratsua
+    onSecondary = MoreaDistiratsua,
+
+    onTertiaryFixed = MoreaIluna,
+    onSecondaryFixed = MoreaArgia
 )
 
 

@@ -34,7 +34,8 @@ data class MainUiState(
     val username: String = "",
     val showUsernameDialog: Boolean = false,
     val currentTheme: ThemeSetting = ThemeSetting.SYSTEM,
-    val currentFilter: SubscriptionFilter = SubscriptionFilter.ALFABETIKOA
+    val currentFilter: SubscriptionFilter = SubscriptionFilter.ALFABETIKOA,
+    val monthlyBudget: Double = 0.0
 )
 
 private data class AllCosts(
@@ -58,16 +59,30 @@ class MainViewModel(
     private val _dialogUsernameInput = MutableStateFlow("")
     val dialogUsernameInput: StateFlow<String> = _dialogUsernameInput.asStateFlow()
     private val _currentFilter = MutableStateFlow(SubscriptionFilter.ALFABETIKOA)
+    private val _monthlyBudget = MutableStateFlow(userPrefs.getMonthlyBudget())
 
     val uiState: StateFlow<MainUiState> = combine(
-        subscriptionDao.getAllSubscriptions(),
-        _username,
-        _showUsernameDialog,
-        _currentTheme,
-        _currentFilter
-    ) { subs, name, showDialog, theme, filter ->
+        listOf( // Flow guztiak zerrenda batean sartu
+            subscriptionDao.getAllSubscriptions(),
+            _username,
+            _showUsernameDialog,
+            _currentTheme,
+            _currentFilter,
+            _monthlyBudget
+        )
+    ) { args -> // 'args' array bat da, emaitza guztiekin
+        // Array-tik banan-banan atera (ordena berean!)
+        val subs = args[0] as List<Subscription>
+        val name = args[1] as String
+        val showDialog = args[2] as Boolean
+        val theme = args[3] as ThemeSetting
+        val filter = args[4] as SubscriptionFilter
+        val budget = args[5] as Double
+
+        // Orain logika bera erabili
         val sortedSubs = sortSubscriptions(subs, filter)
-        val allCosts = calculateAllCosts(subs)
+        val allCosts = calculateAllCosts(subs) // Jatorrizko zerrenda erabili kostuak kalkulatzeko
+
         MainUiState(
             subscriptions = sortedSubs,
             totalMonthlyCost = allCosts.monthly,
@@ -76,6 +91,7 @@ class MainViewModel(
             username = name,
             showUsernameDialog = showDialog,
             currentTheme = theme,
+            monthlyBudget = budget,
             currentFilter = filter
         )
     }.stateIn(
@@ -152,5 +168,13 @@ class MainViewModel(
         }
 
         return calendar.time
+    }
+
+    /**
+     * Aurrekontu berria gordetzen du.
+     */
+    fun onBudgetChange(newBudget: Double) {
+        userPrefs.saveMonthlyBudget(newBudget) // Repo-an gorde
+        _monthlyBudget.value = newBudget       // Flow-a eguneratu
     }
 }

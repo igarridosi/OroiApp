@@ -11,6 +11,7 @@ enum class ThemeSetting {
 class UserPreferencesRepository(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val BUDGET_KEY = "monthly_budget"
 
     fun isFirstLaunch(): Boolean {
         return prefs.getBoolean(IS_FIRST_LAUNCH_KEY, true)
@@ -42,6 +43,21 @@ class UserPreferencesRepository(context: Context) {
         val themeName = prefs.getString(THEME_SETTING_KEY, ThemeSetting.SYSTEM.name)
         return ThemeSetting.valueOf(themeName ?: ThemeSetting.SYSTEM.name)
     }
+    /**
+     * Gordetako aurrekontua irakurtzen du.
+     * Lehenetsitako balioa 0.0 da (mugarik gabe).
+     */
+    fun getMonthlyBudget(): Double {
+        // String bezala gorde eta Double-era bihurtu, zehaztasuna ez galtzeko
+        val budgetString = prefs.getString(BUDGET_KEY, "0.0")
+        return budgetString?.toDoubleOrNull() ?: 0.0
+    }
+    /**
+     * Aurrekontu berria gordetzen du.
+     */
+    fun saveMonthlyBudget(budget: Double) {
+        prefs.edit().putString(BUDGET_KEY, budget.toString()).apply()
+    }
 
     companion object {
         private const val PREFS_NAME = "OroiUserPrefs"
@@ -49,5 +65,6 @@ class UserPreferencesRepository(context: Context) {
         private const val IS_FIRST_LAUNCH_KEY = "is_first_launch"
         // Gako berria gaia gordetzeko
         private const val THEME_SETTING_KEY = "theme_setting"
+        private const val BUDGET_KEY = "monthly_budget"
     }
 }

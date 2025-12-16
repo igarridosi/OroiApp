@@ -158,6 +158,12 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(24.dp))
             CostCarousel(uiState = uiState)
             Spacer(modifier = Modifier.height(24.dp))
+            BudgetProgressBar(
+                currentMonthlyCost = uiState.totalMonthlyCost,
+                budgetLimit = uiState.monthlyBudget,
+                onBudgetChange = viewModel::onBudgetChange
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             FilterChipRow(
                 currentFilter = uiState.currentFilter,
                 onFilterSelected = viewModel::updateFilter
