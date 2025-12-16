@@ -51,6 +51,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
@@ -123,7 +126,7 @@ fun MainScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 70.dp, start = 16.dp, end = 16.dp),
+                    .padding(top = 16.dp, bottom = 30.dp, start = 16.dp, end = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -160,7 +163,7 @@ fun MainScreen(
             MainHeader(username = uiState.username)
             Spacer(modifier = Modifier.height(24.dp))
             CostCarousel(uiState = uiState)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             BudgetProgressBar(
                 currentMonthlyCost = uiState.totalMonthlyCost,
                 budgetLimit = uiState.monthlyBudget,
@@ -299,12 +302,12 @@ fun FilterChipRow(
             onClick = onStatsClick,
             modifier = Modifier
                 .size(48.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
         ) {
             Icon(
                 imageVector = Icons.Default.BarChart,
                 contentDescription = "Estatistikak",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -419,8 +422,6 @@ fun SubscriptionList(
                                 tintColor = Color.Transparent
                             }
                         }
-
-
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -540,13 +541,31 @@ fun ThemeChooserDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextButton(onClick = { onThemeSelected(ThemeSetting.SYSTEM) }) {
-                    Text("Sistemaren arabera")
+                    Text("Sistemaren Modua", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.SettingsBrightness,
+                        contentDescription = "Sistema",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
                 TextButton(onClick = { onThemeSelected(ThemeSetting.LIGHT) }) {
-                    Text("Modu Argia")
+                    Text("Modu Argia", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.LightMode,
+                        contentDescription = "Argia",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
                 TextButton(onClick = { onThemeSelected(ThemeSetting.DARK) }) {
-                    Text("Modu Iluna")
+                    Text("Modu Iluna", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.DarkMode,
+                        contentDescription = "Iluna",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         },
@@ -556,7 +575,11 @@ fun ThemeChooserDialog(
                 horizontalArrangement = Arrangement.Center
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Itxi")
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Itxi",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
