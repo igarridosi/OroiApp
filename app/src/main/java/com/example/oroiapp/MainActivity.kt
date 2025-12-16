@@ -31,6 +31,7 @@ import androidx.navigation.navArgument
 import com.example.oroiapp.ui.AddSubscriptionScreen
 import com.example.oroiapp.ui.EditSubscriptionScreen
 import com.example.oroiapp.ui.MainScreen
+import com.example.oroiapp.ui.StatisticsScreen
 import com.example.oroiapp.ui.theme.OroiTheme
 import com.example.oroiapp.viewmodel.AddEditViewModel
 import com.example.oroiapp.viewmodel.EditSubscriptionViewModel
@@ -124,7 +125,8 @@ fun OroiApp(factory: ViewModelProvider.Factory) {
                             ).show()
                         }
                     }
-                }
+                },
+                onStatsClick = { navController.navigate("statistics_screen") }
             )
         }
 
@@ -158,6 +160,12 @@ fun OroiApp(factory: ViewModelProvider.Factory) {
                 onNavigateBack = { navController.navigate("main_screen") {
                     popUpTo("main_screen") { inclusive = true }
                 } }
+            )
+        }
+        composable("statistics_screen") {
+            StatisticsScreen(
+                viewModel = mainViewModel,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

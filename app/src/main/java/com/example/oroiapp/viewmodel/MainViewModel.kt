@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.example.oroiapp.data.ThemeSetting
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.util.Locale.filter
@@ -36,6 +37,11 @@ data class MainUiState(
     val currentTheme: ThemeSetting = ThemeSetting.SYSTEM,
     val currentFilter: SubscriptionFilter = SubscriptionFilter.ALFABETIKOA,
     val monthlyBudget: Double = 0.0
+)
+
+data class ChartData(
+    val label: String, // Adibidez: "Netflix"
+    val value: Float   // Adibidez: 12.99
 )
 
 private data class AllCosts(
@@ -176,5 +182,32 @@ class MainViewModel(
     fun onBudgetChange(newBudget: Double) {
         userPrefs.saveMonthlyBudget(newBudget) // Repo-an gorde
         _monthlyBudget.value = newBudget       // Flow-a eguneratu
+    }
+
+    /**
+     * Harpidetzak prezioaren arabera ordenatu eta grafikorako prestatzen ditu.
+     * 5 garestienak bakarrik itzultzen ditu, grafikoa ez betetzeko.
+     */
+    val topExpensesChartData: Flow<List<ChartData>> = uiState.map { state ->
+        state.subscriptions
+            .map { sub ->
+                // 1. URRATSA: Lehenik, harpidetza bakoitzaren hileko balio erreala kalkulatu
+                val monthlyValue = when (sub.billingCycle) {
+                    BillingCycle.WEEKLY -> sub.amount * 4
+                    BillingCycle.MONTHLY -> sub.amount
+                    BillingCycle.ANNUAL -> sub.amount / 12
+                }
+                // Datu parea sortu (Harpidetza + Hileko Balioa) gero ordenatu ahal izateko
+                sub to monthlyValue
+            }
+            .sortedByDescending { it.second } // 2. URRATSA: Hileko balioaren arabera ordenatu
+            .take(5) // Top 5 hartu
+            .map { (sub, monthlyValue) ->
+                // 3. URRATSA: Grafikorako datuak sortu, HILEKO BALIOA erabiliz
+                ChartData(
+                    label = sub.name,
+                    value = monthlyValue.toFloat() // <-- GAKOA: Hemen balio kalkulatua jartzen dugu
+                )
+            }
     }
 }

@@ -60,6 +60,12 @@ dependencies {
 
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
 
+    // Vico Charts (Compose-rako)
+    val vicoVersion = "1.14.0"
+    implementation("com.patrykandpatrick.vico:compose:$vicoVersion")
+    implementation("com.patrykandpatrick.vico:compose-m3:$vicoVersion") // Material 3 laguntza
+    implementation("com.patrykandpatrick.vico:core:$vicoVersion")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

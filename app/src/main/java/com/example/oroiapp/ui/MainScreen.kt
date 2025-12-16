@@ -50,6 +50,7 @@ import com.example.oroiapp.viewmodel.SubscriptionFilter
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
@@ -80,6 +81,7 @@ fun MainHeader(username: String) {
                 color = MaterialTheme.colorScheme.primary
             )
         }
+
     }
 }
 
@@ -90,7 +92,8 @@ fun MainScreen(
     viewModel: MainViewModel,
     onAddSubscription: () -> Unit,
     onEditSubscription: (Int) -> Unit,
-    onCancelSubscription: (Subscription) -> Unit
+    onCancelSubscription: (Subscription) -> Unit,
+    onStatsClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dialogInput by viewModel.dialogUsernameInput.collectAsState()
@@ -166,7 +169,8 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(16.dp))
             FilterChipRow(
                 currentFilter = uiState.currentFilter,
-                onFilterSelected = viewModel::updateFilter
+                onFilterSelected = viewModel::updateFilter,
+                onStatsClick = onStatsClick
             )
             SubscriptionList(
                 subscriptions = uiState.subscriptions,
@@ -247,7 +251,8 @@ fun CostCard(title: String, amount: Double) {
 @Composable
 fun FilterChipRow(
     currentFilter: SubscriptionFilter,
-    onFilterSelected: (SubscriptionFilter) -> Unit
+    onFilterSelected: (SubscriptionFilter) -> Unit,
+    onStatsClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -269,7 +274,7 @@ fun FilterChipRow(
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ORDAINKETA_DATA,
             onClick = { onFilterSelected(SubscriptionFilter.ORDAINKETA_DATA) },
-            label = { Text("Ordainketa Data") },
+            label = { Text("Data") },
             colors = FilterChipDefaults.filterChipColors(
                 selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
                 selectedLabelColor = MaterialTheme.colorScheme.surface,
@@ -288,6 +293,20 @@ fun FilterChipRow(
                 labelColor = MaterialTheme.colorScheme.onPrimary
             )
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        // ESTATISTIKA BOTOIA
+        IconButton(
+            onClick = onStatsClick,
+            modifier = Modifier
+                .size(48.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+        ) {
+            Icon(
+                imageVector = Icons.Default.BarChart,
+                contentDescription = "Estatistikak",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
