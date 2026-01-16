@@ -1,6 +1,7 @@
 package com.example.oroiapp.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.oroiapp.worker.NotificationScheduler
+import androidx.glance.appwidget.updateAll
+import com.example.oroiapp.widget.OroiWidget
 
 class EditSubscriptionViewModel(
     private val subscriptionDao: SubscriptionDao,
@@ -61,6 +64,8 @@ class EditSubscriptionViewModel(
 
         subscriptionDao.update(updatedSubscription)
         NotificationScheduler.scheduleReminder(context, updatedSubscription)
+        // Eguneratu Widget-a
+        OroiWidget().updateAll(context = context)
     }
 
     suspend fun deleteSubscription() {
@@ -85,5 +90,9 @@ class EditSubscriptionViewModel(
     }
     fun onBillingCycleChange(newCycle: BillingCycle) { _formState.update { it.copy(billingCycle = newCycle) } }
     fun onDateChange(newDate: Date) { _formState.update { it.copy(firstPaymentDate = newDate) } }
+
+    suspend fun updateWidget(context: Context) {
+        OroiWidget().updateAll(context)
+    }
 }
 

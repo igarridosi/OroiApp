@@ -1,6 +1,7 @@
 package com.example.oroiapp.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.oroiapp.data.CancellationLinkDao
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import androidx.glance.appwidget.updateAll
+import com.example.oroiapp.widget.OroiWidget
 
 // Formularioko eremuen egoera gordetzeko datu-klasea
 data class SubscriptionFormState(
@@ -68,4 +71,8 @@ class AddEditViewModel(
     fun onAmountChange(newAmount: String) { if (newAmount.isEmpty() || newAmount.matches(Regex("^\\d*\\.?\\d*\$"))) { _formState.update { it.copy(amount = newAmount) } } }
     fun onBillingCycleChange(newCycle: BillingCycle) { _formState.update { it.copy(billingCycle = newCycle) } }
     fun onDateChange(newDate: Date) { _formState.update { it.copy(firstPaymentDate = newDate) } }
+
+    suspend fun updateWidget(context: Context) {
+        OroiWidget().updateAll(context)
+    }
 }
