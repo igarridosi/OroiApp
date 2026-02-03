@@ -126,7 +126,13 @@ fun MainScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 30.dp, start = 16.dp, end = 16.dp),
+                    // 1. Ertzetako padding-a (horizontala)
+                    .padding(horizontal = 16.dp)
+                    // 2. Beheko barraren (navigation bar) altuera errespetatu
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    // 3. Tarte gehigarria botoiak barraren gainetik pixka bat flotatzeko (adibidez 16dp)
+                    .padding(bottom = 16.dp, top = 16.dp), // 'top' ere gehitu dut botoien gainean tarte bat uzteko
+
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -361,7 +367,7 @@ fun SubscriptionList(
             // Sortu dugun egoera LazyColumn-ari esleitu
             state = listState,
             // Padding-a elementu bakoitzari emango diogu, ez zerrendari
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
 
         ) {
             items(items = subscriptions, key = { it.id }) { subscription ->

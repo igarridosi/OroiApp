@@ -3,7 +3,7 @@
     android:description="@string/app_name"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="250dp"
-    android:minHeight="150dp"
+    android:minHeight="100dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="3600000"
     android:widgetCategory="home_screen" />

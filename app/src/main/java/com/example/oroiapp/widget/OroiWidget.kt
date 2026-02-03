@@ -132,22 +132,13 @@ class OroiWidget : GlanceAppWidget() {
                         )
                     }
 
-                    if (isLoading) {
-                        // Kargatzen ari bada, gurpila erakutsi
-                        CircularProgressIndicator(
-                            modifier = GlanceModifier.size(24.dp),
-                            color = ColorProvider(Color.White)
-                        )
-                    } else {
-                        // Bestela, botoia erakutsi
-                        Image(
-                            provider = ImageProvider(android.R.drawable.ic_popup_sync),
-                            contentDescription = "Refresh",
-                            modifier = GlanceModifier
-                                .size(24.dp)
-                                .clickable(actionRunCallback<RefreshAction>())
-                        )
-                    }
+                    Image(
+                        provider = ImageProvider(android.R.drawable.ic_popup_sync),
+                        contentDescription = "Refresh",
+                        modifier = GlanceModifier
+                            .size(24.dp)
+                            .clickable(actionRunCallback<RefreshAction>())
+                    )
                 }
 
                 Spacer(modifier = GlanceModifier.height(12.dp))
