@@ -12,7 +12,7 @@ Eskola-proiektu gisa garatua, Android-en teknologia modernoenak erabiliz, arkite
 
 | Logo-a | Pantaila Nagusia | Dark Mode | Estatistikak (Grafikoa) | Notifikazioa | Widget-a |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| ![Logo-a](\screenshots\logo.png) | ![Pantaila Nagusia](\screenshots\mainscreen.png) | ![Dark Mode](\screenshots\mainscreen_darkmode.png) | ![Estatistikak](\screenshots\chart.png) | ![Notifikazioa](\screenshots\notification.png) | ![Widget](\screenshots\widget.png) |
+| ![Logo-a](./screenshots/logo.png) | ![Pantaila Nagusia](./screenshots/mainscreen.png) | ![Dark Mode](./screenshots/mainscreen_darkmode.png) | ![Estatistikak](./screenshots/chart.png) | ![Notifikazioa](./screenshots/notification.png) | ![Widget](./screenshots/widget.png) |
 
 ## ✨ Ezaugarriak
 
