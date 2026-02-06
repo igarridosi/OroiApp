@@ -1,60 +1,75 @@
-    
-# Oroi
+```markdown
+# OroiApp
 
-### Zure harpidetzen kontrola, zure eskuan.
+### Zure harpidetzen kontrola, sinpletasunez.
 
-`Oroi`, euskerazko "Oroitu" hitzatikan dator. Aplikazio honen filosofia finantza-kontzientzia sustatzea da, tresna minimalista, dotore eta funtzional baten bidez. Erabiltzaileak bere harpidetzak eskuz sartzen ditu, gastuen jarraipen aktibo eta kontzientea bultzatuz.
+`Oroi` euskerazko hitza da eta "gogoratu" esan nahi du. Aplikazio honen filosofia finantza-kontzientzia sustatzea da, tresna minimalist, dotore eta funtzional baten bidez. Erabiltzaileak bere harpidetzak eskuz sartzen ditu, gastuen jarraipen aktibo eta kontzientea bultzatuz.
+
+Eskola-proiektu gisa garatua, Android-en teknologia modernoenak erabiliz, arkitektura garbi eta sendo bat jarraituz.
+
+**Oharra:** Proiektu hau osorik euskaraz garatu da.
+
+## 📱 Pantaila-argazkiak
+
+| Logo-a | Pantaila Nagusia | Dark Mode | Estatistikak (Grafikoa) | Notifikazioa | Widget-a |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ![Logo-a](\screenshots\logo.png) | ![Pantaila Nagusia](\screenshots\mainscreen.png) | ![Dark Mode](\screenshots\mainscreen_darkmode.png) | ![Estatistikak](\screenshots\chart.png) | ![Notifikazioa](\screenshots\notification.png) | ![Widget](\screenshots\widget.png) |
 
 ## ✨ Ezaugarriak
 
-### ✅ Inplementatutako Ezaugarriak (MVP)
+### 🌟 Funtzionalitate Nagusiak
 
 *   **Harpidetzen Kudeaketa Osoa:** Sortu, irakurri, eguneratu eta ezabatu (CRUD) zure hileko edo urteko harpidetzak modu sinplean.
-*   **Kostuaren Bistaratze Anitza:** Pantaila nagusian, karrusel interaktibo batek zure gastu totala erakusten du hileko, urteko eta eguneko ikuspegietan, zure ohituren inpaktu ekonomikoa hobeto ulertzeko.
-*   **Abisu Adimendunak:** `WorkManager` erabiliz, aplikazioak atzeko planoan lan egiten du jakinarazpen bat bidaltzeko harpidetza bat ordaindu baino 2 egun lehenago. Jakinarazpenak adierazten du zenbat diru aurreztuko zenukeen urtean harpidetza hori ezeztatuz gero.
-*   **Nabigazio Intuitiboa:** Zerrendako elementu bat irristatuz, zuzenean editatzeko pantailara joan zaitezke, datuak aldatzeko edo harpidetza ezabatzeko.
-*   **Identifikazio Bisuala:** Txartel bakoitzak etiketa txiki bat du, fakturazio-zikloa kolore bidez adierazten duena (astero, hilero, urtero), informazioa kolpe batean ikusteko.
+*   **Diseinu Modernoa (Material 3):** Interfaze garbia, modu argi eta ilunarekin (Dark Mode) guztiz bateragarria, eta gaia eskuz aldatzeko aukerarekin.
+*   **Kostuen Ikuspegia:** Karrusel interaktibo bat hileko, urteko eta eguneko gastu totalak ikusteko.
+*   **Hileko Aurrekontua:** Ezarri gastu-muga bat eta ikusi bisualki (barra batekin) zenbat gastatu duzun eta muga gainditu duzun ala ez.
+*   **Estatistikak (Pie Chart):** "Gazta-grafiko" interaktibo eta animatu bat (`Canvas` erabiliz egina), zure gastu nagusiak bisualki aztertzeko.
+*   **Hasierako Pantailako Widget-a:** Ikusi hurrengo ordainketak eta falta diren egunak aplikazioa ireki gabe.
+*   **Segurtasun Biometrikoa:** Babestu zure datuak hatz-marka edo aurpegi bidezko identifikazioarekin aplikazioa irekitzean.
 
-### 🚀 Etorkizuneko Ideiak
+### 🔔 Jakinarazpenak eta Automatizazioa
 
-*   **Kategoriak:** Harpidetzak sailkatzeko aukera (Aisialdia, Lana, Kirola...), gastuen analisia hobetzeko.
-*   **"Botoi Gorria":** Zerbitzu ezagunenetan harpidetza ezeztatzeko orrietara esteka zuzenak dituen datu-base bat.
-*   **Doako Proben Kudeatzailea:** Harpidetzak "proba garaian" daudela markatzeko aukera, amaitu baino lehen abisu intentsiboagoak jasotzeko.
+*   **Abisu Adimendunak:** `WorkManager` erabiliz, aplikazioak jakinarazpen bat bidaltzen du harpidetza bat berritu baino 2 egun lehenago, aurreztu dezakezun diru kopurua gogoraraziz.
+*   **"Botoi Gorria":** Zerrendan ezkerrera irristatuz, zuzenean zerbitzuaren ezeztapen-orrira joateko esteka irekitzen da (Netflix, Spotify, etab.).
 
 ## 🛠️ Teknologiak eta Arkitektura
 
 Proiektu hau Android garapeneko praktika onenak eta tresna modernoenak jarraituz eraiki da.
 
 *   **Lengoaia:** %100 **Kotlin**.
-*   **Interfazea:** %100 **Jetpack Compose**, UI deklaratibo eta erreaktibo bat sortzeko.
-*   **Arkitektura:** **MVVM** (Model-View-ViewModel), ardurak argi bereizteko (`UI` -> `ViewModel` -> `Model`).
+*   **Interfazea:** %100 **Jetpack Compose**, UI deklaratibo eta erreaktibo bat sortzeko. Ez da Fragment-ik erabili ("Single-Activity Architecture").
+*   **Arkitektura:** **MVVM** (Model-View-ViewModel), ardurak argi bereizteko.
 *   **Datu-basea:** **Room**, datuen persistentzia lokala modu sendoan kudeatzeko.
-*   **Asinkronia:** **Kotlin Coroutines** eta **Flow**, datu-fluxuak eta atzeko planoko eragiketak modu eraginkorrean kudeatzeko.
-*   **Nabigazioa:** **Jetpack Navigation for Compose**, aplikazioaren pantailen artean mugitzeko ("Single-Activity Architecture" eredua jarraituz).
-*   **Atzeko Planoko Lanak:** **WorkManager**, abisuak eta jakinarazpenak modu fidagarrian programatzeko, bateriaren kontsumoa optimizatuz.
+*   **Asinkronia:** **Kotlin Coroutines** eta **Flow**, datu-fluxuak eta atzeko planoko eragiketak kudeatzeko.
+*   **Nabigazioa:** **Jetpack Navigation**, aplikazioaren pantailen artean mugitzeko.
+*   **Atzeko Planoko Lanak:** **WorkManager**, abisuak fidagarritasunez programatzeko.
+*   **Widget-ak:** **Jetpack Glance**, hasierako pantailako widget-ak Compose estiloan sortzeko.
+*   **Datuen Biltegiratzea:** **SharedPreferences** erabiltzailearen ezarpenak (izena, gaia, aurrekontua) gordetzeko.
+*   **Segurtasuna:** **BiometricPrompt** autentifikaziorako.
 
 ### Proiektuaren Egitura
-```sh
-.
-├── data/ # Datu-basearekin (Room) erlazionatutako guztia: DAO, entitateak, bihurgailuak.
-├── model/ # Datu-klaseak (Entitateak).
-├── ui/ # Erabiltzailearen interfazea: pantailak (@Composable) eta gaiak.
-├── viewmodel/ # ViewModel klaseak, UI-aren logika eta egoera kudeatzen dutenak.
-└── worker/ # WorkManager-ekin erlazionatutako atzeko planoko lanak.
+
+```
+com.example.oroiapp
+├── data/           # Room (DAO, Database) eta SharedPreferences biltegiak.
+├── model/          # Datu-klaseak (Subscription, CancellationLink, etab.).
+├── ui/             # Erabiltzailearen interfazea (Pantailak, Osagaiak, Gaia).
+├── viewmodel/      # ViewModel klaseak eta Factory-a.
+├── widget/         # Glance Widget-aren inplementazioa.
+└── worker/         # WorkManager-eko langileak (ReminderWorker).
 ```
 
-    
 ## ⚙️ Nola Exekutatu
 
 1.  Repositorio hau klonatu:
     ```bash
     git clone https://github.com/igarridosi/AndroidProjects.git
     ```
-2.  Ireki `OroiApp` karpeta Android Studio-rekin.
-3.  Proiektua sinkronizatu eta exekutatu emuladore edo gailu fisiko batean.
+2.  Ireki `OroiApp` karpeta Android Studio-rekin (Gomendatua: Iguana bertsioa edo berriagoa).
+3.  Proiektua sinkronizatu (Gradle Sync).
+4.  Exekutatu emuladore edo gailu fisiko batean (Android 8.0+ gomendatua).
 
 ## ✒️ Egilea
 
-**Ibai Garrido** - [GitHub Profila](https://github.com/igarridosi)
-
-  
+**Ibai Garrido** - [GitHub Profila](ZURE_GITHUB_PROFILAREN_HELBIDEA)
+```
