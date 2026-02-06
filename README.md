@@ -2,7 +2,7 @@
 
 ### Zure harpidetzen kontrola, sinpletasunez.
 
-`Oroi` euskerazko hitza da eta "gogoratu" esan nahi du. Aplikazio honen filosofia finantza-kontzientzia sustatzea da, tresna minimalist, dotore eta funtzional baten bidez. Erabiltzaileak bere harpidetzak eskuz sartzen ditu, gastuen jarraipen aktibo eta kontzientea bultzatuz.
+`Oroi` euskerazko hitza "Oroitu"-tik dator. Aplikazio honen filosofia finantza-kontzientzia sustatzea da, tresna minimalista, dotore eta funtzional baten bidez. Erabiltzaileak bere harpidetzak eskuz sartzen ditu, gastuen jarraipen aktibo eta kontzientea bultzatuz.
 
 Eskola-proiektu gisa garatua, Android-en teknologia modernoenak erabiliz, arkitektura garbi eta sendo bat jarraituz.
 
@@ -47,7 +47,6 @@ Informazio azkarra aplikazioa ireki gabe.
 *   **Hileko Aurrekontua:** Ezarri gastu-muga bat eta ikusi bisualki (barra batekin) zenbat gastatu duzun eta muga gainditu duzun ala ez.
 *   **Estatistikak (Pie Chart):** "Gazta-grafiko" interaktibo eta animatu bat (`Canvas` erabiliz egina), zure gastu nagusiak bisualki aztertzeko.
 *   **Hasierako Pantailako Widget-a:** Ikusi hurrengo ordainketak eta falta diren egunak aplikazioa ireki gabe.
-*   **Segurtasun Biometrikoa:** Babestu zure datuak hatz-marka edo aurpegi bidezko identifikazioarekin aplikazioa irekitzean.
 
 ### 🔔 Jakinarazpenak eta Automatizazioa
 
@@ -67,7 +66,6 @@ Proiektu hau Android garapeneko praktika onenak eta tresna modernoenak jarraituz
 *   **Atzeko Planoko Lanak:** **WorkManager**, abisuak fidagarritasunez programatzeko.
 *   **Widget-ak:** **Jetpack Glance**, hasierako pantailako widget-ak Compose estiloan sortzeko.
 *   **Datuen Biltegiratzea:** **SharedPreferences** erabiltzailearen ezarpenak (izena, gaia, aurrekontua) gordetzeko.
-*   **Segurtasuna:** **BiometricPrompt** autentifikaziorako.
 
 ### Proiektuaren Egitura
 
