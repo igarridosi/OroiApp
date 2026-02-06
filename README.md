@@ -10,9 +10,32 @@ Eskola-proiektu gisa garatua, Android-en teknologia modernoenak erabiliz, arkite
 
 ## 📱 Pantaila-argazkiak
 
-| Logo-a | Pantaila Nagusia | Dark Mode | Estatistikak (Grafikoa) | Notifikazioa | Widget-a |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| ![Logo-a](./screenshots/logo.png) | ![Pantaila Nagusia](./screenshots/mainscreen.png) | ![Dark Mode](./screenshots/mainscreen_darkmode.png) | ![Estatistikak](./screenshots/chart.png) | ![Notifikazioa](./screenshots/notification.png) | ![Widget](./screenshots/widget.png) |
+### 🎨 Identitatea
+<div align="center">
+  <img src="./screenshots/logo.png" width="200" alt="Oroi Logo">
+</div>
+
+### 🌗 Interfaze Nagusia (Light & Dark)
+Modu argia eta iluna guztiz integratuta daude diseinuarekin.
+
+| Pantaila Nagusia (Light Mode) | Pantaila Nagusia (Dark Mode) |
+| :---: | :---: |
+| ![Pantaila Nagusia](./screenshots/mainscreen.png) | ![Dark Mode](./screenshots/mainscreen_darkmode.png) |
+
+### 📊 Estatistikak
+Gastuak bisualki aztertzeko grafiko interaktiboa.
+
+![Estatistikak](./screenshots/chart.png)
+
+### 🔔 Jakinarazpen Adimendunak
+Aurrezki potentziala gogorarazten duten abisuak.
+
+![Notifikazioa](./screenshots/notification.png)
+
+### 🧩 Hasierako Pantailako Widget-a
+Informazio azkarra aplikazioa ireki gabe.
+
+![Widget](./screenshots/widget.png)
 
 ## ✨ Ezaugarriak
 
