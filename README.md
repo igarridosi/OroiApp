@@ -1,4 +1,3 @@
-```markdown
 # OroiApp
 
 ### Zure harpidetzen kontrola, sinpletasunez.
