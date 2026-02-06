@@ -93,5 +93,5 @@ com.example.oroiapp
 
 ## ✒️ Egilea
 
-**Ibai Garrido** - [GitHub Profila](ZURE_GITHUB_PROFILAREN_HELBIDEA)
+**Ibai Garrido** - [GitHub Profila](https://github.com/igarridosi)
 ```
