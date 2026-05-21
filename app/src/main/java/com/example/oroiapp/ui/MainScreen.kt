@@ -51,7 +51,20 @@ import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun MainHeader(username: String) {
@@ -96,15 +109,40 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dialogInput by viewModel.dialogUsernameInput.collectAsState()
-    var showThemeDialog by remember { mutableStateOf(false) }
+    var showSettingsSheet by remember { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    if (showThemeDialog) {
-        ThemeChooserDialog(
-            onDismiss = { showThemeDialog = false },
-            onThemeSelected = { newTheme ->
-                viewModel.changeTheme(newTheme)
-                showThemeDialog = false
-            }
+    if (showSettingsSheet) {
+        SettingsBottomSheet(
+            uiState = uiState,
+            currentLanguageTag = viewModel.getCurrentLanguageTag(),
+            onThemeSelected = viewModel::changeTheme,
+            onLanguageSelected = viewModel::changeLanguage,
+            onUsernameUpdated = viewModel::updateUsername,
+            onExportCsv = {
+                showSettingsSheet = false
+                scope.launch {
+                    val uri = viewModel.exportToCsv(context)
+                    if (uri != null) {
+                        val shareIntent = android.content.Intent.createChooser(
+                            android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "text/csv"
+                                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            },
+                            context.getString(R.string.export_csv_share_title)
+                        )
+                        context.startActivity(shareIntent)
+                    } else {
+                        android.widget.Toast.makeText(
+                            context, context.getString(R.string.export_csv_empty), android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            },
+            onDismiss = { showSettingsSheet = false }
         )
     }
 
@@ -133,16 +171,15 @@ fun MainScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FloatingActionButton(
-                    onClick = { showThemeDialog = true },
+                    onClick = { showSettingsSheet = true },
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    val icon = when (uiState.currentTheme) {
-                        ThemeSetting.LIGHT -> Icons.Default.LightMode
-                        ThemeSetting.DARK -> Icons.Default.DarkMode
-                        ThemeSetting.SYSTEM -> Icons.Default.SettingsBrightness
-                    }
-                    Icon(icon, contentDescription = stringResource(R.string.fab_change_theme), tint = MaterialTheme.colorScheme.surface)
+                    Icon(
+                        Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.fab_settings),
+                        tint = MaterialTheme.colorScheme.surface
+                    )
                 }
 
                 FloatingActionButton(
@@ -174,8 +211,24 @@ fun MainScreen(
             FilterChipRow(
                 currentFilter = uiState.currentFilter,
                 onFilterSelected = viewModel::updateFilter,
-                onStatsClick = onStatsClick
+                onStatsClick = onStatsClick,
+                showSearch = showSearch,
+                onSearchToggle = {
+                    showSearch = !showSearch
+                    if (!showSearch) viewModel.updateSearchQuery("")
+                }
             )
+            AnimatedVisibility(
+                visible = showSearch,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                SubscriptionSearchBar(
+                    query = uiState.searchQuery,
+                    onQueryChange = viewModel::updateSearchQuery,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
             SubscriptionList(
                 subscriptions = uiState.subscriptions,
                 onEdit = onEditSubscription,
@@ -251,16 +304,45 @@ fun CostCard(title: String, amount: Double) {
 }
 
 @Composable
+fun SubscriptionSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        placeholder = { Text(stringResource(R.string.search_hint)) },
+        leadingIcon = {
+            Icon(Icons.Default.Search, contentDescription = null)
+        },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.search_clear_description))
+                }
+            }
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Composable
 fun FilterChipRow(
     currentFilter: SubscriptionFilter,
     onFilterSelected: (SubscriptionFilter) -> Unit,
-    onStatsClick: () -> Unit
+    onStatsClick: () -> Unit,
+    showSearch: Boolean = false,
+    onSearchToggle: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ALFABETIKOA,
@@ -295,11 +377,29 @@ fun FilterChipRow(
                 labelColor = MaterialTheme.colorScheme.onPrimary
             )
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(
+            onClick = onSearchToggle,
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    if (showSearch) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.primaryContainer,
+                    CircleShape
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = stringResource(R.string.search_hint),
+                tint = if (showSearch) MaterialTheme.colorScheme.surface
+                       else MaterialTheme.colorScheme.onPrimary
+            )
+        }
+        Spacer(modifier = Modifier.weight(0.2f))
         IconButton(
             onClick = onStatsClick,
             modifier = Modifier
-                .size(48.dp)
+                .size(40.dp)
                 .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
         ) {
             Icon(
@@ -319,6 +419,25 @@ fun SubscriptionList(
     onCancel: (Subscription) -> Unit,
     contentPadding: PaddingValues
 ) {
+    var pendingCancel by remember { mutableStateOf<Subscription?>(null) }
+
+    pendingCancel?.let { sub ->
+        AlertDialog(
+            onDismissRequest = { pendingCancel = null },
+            title = { Text(stringResource(R.string.confirm_cancel_title)) },
+            text = { Text(stringResource(R.string.confirm_cancel_message, sub.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onCancel(sub)
+                    pendingCancel = null
+                }) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingCancel = null }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
     if (subscriptions.isEmpty()) {
         Box(
             modifier = Modifier
@@ -365,7 +484,7 @@ fun SubscriptionList(
                                 return@rememberSwipeToDismissBoxState false
                             }
                             SwipeToDismissBoxValue.StartToEnd -> {
-                                onCancel(subscription)
+                                pendingCancel = subscription
                                 return@rememberSwipeToDismissBoxState false
                             }
                             else -> return@rememberSwipeToDismissBoxState false
@@ -431,7 +550,9 @@ fun SubscriptionItem(subscription: Subscription) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {},
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -480,6 +601,11 @@ fun BillingCycleBadge(cycle: BillingCycle, modifier: Modifier = Modifier) {
         BillingCycle.MONTHLY -> stringResource(R.string.billing_badge_monthly)
         BillingCycle.ANNUAL -> stringResource(R.string.billing_badge_annual)
     }
+    val description = when (cycle) {
+        BillingCycle.WEEKLY -> stringResource(R.string.billing_badge_weekly_desc)
+        BillingCycle.MONTHLY -> stringResource(R.string.billing_badge_monthly_desc)
+        BillingCycle.ANNUAL -> stringResource(R.string.billing_badge_annual_desc)
+    }
     val color = when (cycle) {
         BillingCycle.WEEKLY -> MaterialTheme.colorScheme.onTertiary
         BillingCycle.MONTHLY -> MaterialTheme.colorScheme.onTertiaryContainer
@@ -491,6 +617,7 @@ fun BillingCycleBadge(cycle: BillingCycle, modifier: Modifier = Modifier) {
             .size(24.dp)
             .clip(CircleShape)
             .background(color)
+            .semantics { contentDescription = description }
     ) {
         Text(text = text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }

@@ -50,6 +50,9 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
+    // AppCompat — per-app language switching via AppCompatDelegate
+    implementation("androidx.appcompat:appcompat:1.7.0")
+
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
 

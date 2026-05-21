@@ -3,22 +3,29 @@ package com.example.oroiapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.oroiapp.data.SubscriptionDao
+import com.example.oroiapp.data.ThemeSetting
 import com.example.oroiapp.data.UserPreferencesRepository
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.model.Subscription
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.example.oroiapp.data.ThemeSetting
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
-import java.util.Locale.filter
 
 enum class SubscriptionFilter {
     ALFABETIKOA,
@@ -26,7 +33,6 @@ enum class SubscriptionFilter {
     PREZIOA
 }
 
-// Interfazearen egoera definitzen du
 data class MainUiState(
     val subscriptions: List<Subscription> = emptyList(),
     val totalMonthlyCost: Double = 0.0,
@@ -36,61 +42,55 @@ data class MainUiState(
     val showUsernameDialog: Boolean = false,
     val currentTheme: ThemeSetting = ThemeSetting.SYSTEM,
     val currentFilter: SubscriptionFilter = SubscriptionFilter.ALFABETIKOA,
-    val monthlyBudget: Double = 0.0
+    val monthlyBudget: Double = 0.0,
+    val searchQuery: String = ""
 )
 
 data class ChartData(
-    val label: String, // Adibidez: "Netflix"
-    val value: Float   // Adibidez: 12.99
+    val label: String,
+    val value: Float
 )
 
-private data class AllCosts(
-    val monthly: Double,
-    val annual: Double,
-    val daily: Double
-)
+private data class AllCosts(val monthly: Double, val annual: Double, val daily: Double)
 
 class MainViewModel(
     private val subscriptionDao: SubscriptionDao,
     private val userPrefs: UserPreferencesRepository
 ) : ViewModel() {
 
-    // Sortu MutableStateFlow bat uneko gaia gordetzeko ViewModel-ean.
-    // Hasierako balioa SharedPreferences-etik irakurtzen dugu.
     private val _currentTheme = MutableStateFlow(userPrefs.getThemeSetting())
-
-    // StateFlow bat interfazearen egoera erakusteko
     private val _username = MutableStateFlow(userPrefs.getUsername())
     private val _showUsernameDialog = MutableStateFlow(userPrefs.isFirstLaunch())
     private val _dialogUsernameInput = MutableStateFlow("")
     val dialogUsernameInput: StateFlow<String> = _dialogUsernameInput.asStateFlow()
     private val _currentFilter = MutableStateFlow(SubscriptionFilter.ALFABETIKOA)
     private val _monthlyBudget = MutableStateFlow(userPrefs.getMonthlyBudget())
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     val uiState: StateFlow<MainUiState> = combine(
-        listOf( // Flow guztiak zerrenda batean sartu
+        listOf(
             subscriptionDao.getAllSubscriptions(),
             _username,
             _showUsernameDialog,
             _currentTheme,
             _currentFilter,
-            _monthlyBudget
+            _monthlyBudget,
+            _searchQuery
         )
-    ) { args -> // 'args' array bat da, emaitza guztiekin
-        // Array-tik banan-banan atera (ordena berean!)
+    ) { args ->
         val subs = args[0] as List<Subscription>
         val name = args[1] as String
         val showDialog = args[2] as Boolean
         val theme = args[3] as ThemeSetting
         val filter = args[4] as SubscriptionFilter
         val budget = args[5] as Double
-
-        // Orain logika bera erabili
-        val sortedSubs = sortSubscriptions(subs, filter)
-        val allCosts = calculateAllCosts(subs) // Jatorrizko zerrenda erabili kostuak kalkulatzeko
-
+        val query = args[6] as String
+        val filtered = if (query.isBlank()) subs
+                       else subs.filter { it.name.contains(query, ignoreCase = true) }
+        val allCosts = calculateAllCosts(filtered)
         MainUiState(
-            subscriptions = sortedSubs,
+            subscriptions = sortSubscriptions(filtered, filter),
             totalMonthlyCost = allCosts.monthly,
             totalAnnualCost = allCosts.annual,
             totalDailyCost = allCosts.daily,
@@ -98,7 +98,8 @@ class MainViewModel(
             showUsernameDialog = showDialog,
             currentTheme = theme,
             monthlyBudget = budget,
-            currentFilter = filter
+            currentFilter = filter,
+            searchQuery = query
         )
     }.stateIn(
         scope = viewModelScope,
@@ -106,29 +107,23 @@ class MainViewModel(
         initialValue = MainUiState()
     )
 
-    // Funtzio nagusi bat kostu guztiak kalkulatzeko
     private fun calculateAllCosts(subscriptions: List<Subscription>): AllCosts {
         val monthlyCost = subscriptions.sumOf { sub ->
             when (sub.billingCycle) {
-                BillingCycle.WEEKLY -> sub.amount * 4 // Hurbilketa
+                BillingCycle.WEEKLY -> sub.amount * 4
                 BillingCycle.MONTHLY -> sub.amount
                 BillingCycle.ANNUAL -> sub.amount / 12
             }
         }
-        val annualCost = monthlyCost * 12
-        val dailyCost = monthlyCost / 30 // Hurbilketa (30 eguneko hilabetea)
-
-        return AllCosts(monthly = monthlyCost, annual = annualCost, daily = dailyCost)
+        return AllCosts(monthly = monthlyCost, annual = monthlyCost * 12, daily = monthlyCost / 30)
     }
 
     fun changeTheme(newTheme: ThemeSetting) {
-        userPrefs.saveThemeSetting(newTheme) // Gorde SharedPreferences-en
-        _currentTheme.value = newTheme       // Eguneratu ViewModel-eko egoera
+        userPrefs.saveThemeSetting(newTheme)
+        _currentTheme.value = newTheme
     }
 
-    fun onDialogUsernameChange(name: String) {
-        _dialogUsernameInput.value = name
-    }
+    fun onDialogUsernameChange(name: String) { _dialogUsernameInput.value = name }
 
     fun onUsernameSave() {
         val name = _dialogUsernameInput.value.trim()
@@ -139,9 +134,26 @@ class MainViewModel(
         }
     }
 
-    fun updateFilter(filter: SubscriptionFilter) {
-        _currentFilter.value = filter
+    fun updateUsername(name: String) {
+        if (name.isNotBlank()) {
+            userPrefs.saveUsername(name)
+            _username.value = name
+        }
     }
+
+    private val _languageChangeEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val languageChangeEvent: SharedFlow<Unit> = _languageChangeEvent.asSharedFlow()
+
+    fun changeLanguage(tag: String) {
+        userPrefs.saveLanguageTag(tag)
+        _languageChangeEvent.tryEmit(Unit)
+    }
+
+    fun getCurrentLanguageTag(): String = userPrefs.getLanguageTag()
+
+    fun updateFilter(filter: SubscriptionFilter) { _currentFilter.value = filter }
+
+    fun updateSearchQuery(query: String) { _searchQuery.value = query }
 
     private fun sortSubscriptions(subscriptions: List<Subscription>, filter: SubscriptionFilter): List<Subscription> {
         return when (filter) {
@@ -153,18 +165,12 @@ class MainViewModel(
 
     private fun calculateNextPaymentDate(subscription: Subscription): java.util.Date {
         val calendar = java.util.Calendar.getInstance()
-        val today = java.util.Calendar.getInstance()
-        today.set(java.util.Calendar.HOUR_OF_DAY, 0)
-        today.set(java.util.Calendar.MINUTE, 0)
-        today.set(java.util.Calendar.SECOND, 0)
-        today.set(java.util.Calendar.MILLISECOND, 0)
-
-        calendar.time = subscription.firstPaymentDate
-
-        if (calendar.time.after(today.time)) {
-            return calendar.time
+        val today = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0); set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0); set(java.util.Calendar.MILLISECOND, 0)
         }
-
+        calendar.time = subscription.firstPaymentDate
+        if (calendar.time.after(today.time)) return calendar.time
         while (calendar.time.before(today.time)) {
             when (subscription.billingCycle) {
                 BillingCycle.WEEKLY -> calendar.add(java.util.Calendar.WEEK_OF_YEAR, 1)
@@ -172,42 +178,45 @@ class MainViewModel(
                 BillingCycle.ANNUAL -> calendar.add(java.util.Calendar.YEAR, 1)
             }
         }
-
         return calendar.time
     }
 
-    /**
-     * Aurrekontu berria gordetzen du.
-     */
     fun onBudgetChange(newBudget: Double) {
-        userPrefs.saveMonthlyBudget(newBudget) // Repo-an gorde
-        _monthlyBudget.value = newBudget       // Flow-a eguneratu
+        userPrefs.saveMonthlyBudget(newBudget)
+        _monthlyBudget.value = newBudget
     }
 
-    /**
-     * Harpidetzak prezioaren arabera ordenatu eta grafikorako prestatzen ditu.
-     * 5 garestienak bakarrik itzultzen ditu, grafikoa ez betetzeko.
-     */
+    suspend fun exportToCsv(context: Context): Uri? {
+        return try {
+            val subs = subscriptionDao.getAllSubscriptions().first()
+            if (subs.isEmpty()) return null
+            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            val csv = buildString {
+                appendLine("Name,Amount,Currency,Billing Cycle,First Payment Date")
+                subs.forEach { sub ->
+                    appendLine("\"${sub.name}\",${sub.amount},${sub.currency},${sub.billingCycle.name},${dateFormat.format(sub.firstPaymentDate)}")
+                }
+            }
+            val file = File(context.cacheDir, "oroi_subscriptions.csv")
+            file.writeText(csv)
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     val topExpensesChartData: Flow<List<ChartData>> = uiState.map { state ->
         state.subscriptions
             .map { sub ->
-                // 1. URRATSA: Lehenik, harpidetza bakoitzaren hileko balio erreala kalkulatu
                 val monthlyValue = when (sub.billingCycle) {
                     BillingCycle.WEEKLY -> sub.amount * 4
                     BillingCycle.MONTHLY -> sub.amount
                     BillingCycle.ANNUAL -> sub.amount / 12
                 }
-                // Datu parea sortu (Harpidetza + Hileko Balioa) gero ordenatu ahal izateko
                 sub to monthlyValue
             }
-            .sortedByDescending { it.second } // 2. URRATSA: Hileko balioaren arabera ordenatu
-            .take(5) // Top 5 hartu
-            .map { (sub, monthlyValue) ->
-                // 3. URRATSA: Grafikorako datuak sortu, HILEKO BALIOA erabiliz
-                ChartData(
-                    label = sub.name,
-                    value = monthlyValue.toFloat() // <-- GAKOA: Hemen balio kalkulatua jartzen dugu
-                )
-            }
+            .sortedByDescending { it.second }
+            .take(5)
+            .map { (sub, monthlyValue) -> ChartData(label = sub.name, value = monthlyValue.toFloat()) }
     }
 }

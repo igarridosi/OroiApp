@@ -24,9 +24,48 @@ fun EditSubscriptionScreen(
     val formState by viewModel.formState.collectAsState()
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
     var isSaving by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var attemptedSave by remember { mutableStateOf(false) }
+
+    val nameError = attemptedSave && formState.name.isBlank()
+    val amountError = attemptedSave && (formState.amount.isBlank() || (formState.amount.toDoubleOrNull() ?: 0.0) <= 0)
+
+    val errorSaveMessage = stringResource(R.string.error_save_failed)
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.confirm_delete_title)) },
+            text = { Text(stringResource(R.string.confirm_delete_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        scope.launch {
+                            isSaving = true
+                            try {
+                                viewModel.deleteSubscription()
+                                onNavigateBack()
+                            } catch (e: Exception) {
+                                isSaving = false
+                                snackbarHostState.showSnackbar(errorSaveMessage)
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.edit_subscription_title)) },
@@ -52,13 +91,21 @@ fun EditSubscriptionScreen(
                 value = formState.name,
                 onValueChange = viewModel::onNameChange,
                 label = { Text(stringResource(R.string.name_field_label)) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = nameError,
+                supportingText = if (nameError) {
+                    { Text(stringResource(R.string.error_name_required), color = MaterialTheme.colorScheme.error) }
+                } else null
             )
             OutlinedTextField(
                 value = formState.amount,
                 onValueChange = viewModel::onAmountChange,
                 label = { Text(stringResource(R.string.amount_field_label)) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = amountError,
+                supportingText = if (amountError) {
+                    { Text(stringResource(R.string.error_amount_invalid), color = MaterialTheme.colorScheme.error) }
+                } else null
             )
             BillingCycleSelector(
                 selectedCycle = formState.billingCycle,
@@ -73,13 +120,21 @@ fun EditSubscriptionScreen(
 
             Button(
                 onClick = {
-                    if (!isSaving) {
+                    attemptedSave = true
+                    val hasErrors = formState.name.isBlank() ||
+                        formState.amount.isBlank() ||
+                        (formState.amount.toDoubleOrNull() ?: 0.0) <= 0
+                    if (!hasErrors && !isSaving) {
                         scope.launch {
                             isSaving = true
                             focusManager.clearFocus()
-                            viewModel.saveSubscription()
-                            isSaving = false
-                            onNavigateBack()
+                            try {
+                                viewModel.saveSubscription()
+                                onNavigateBack()
+                            } catch (e: Exception) {
+                                isSaving = false
+                                snackbarHostState.showSnackbar(errorSaveMessage)
+                            }
                         }
                     }
                 },
@@ -94,17 +149,7 @@ fun EditSubscriptionScreen(
             }
 
             OutlinedButton(
-                onClick = {
-                    if (!isSaving) {
-                        scope.launch {
-                            isSaving = true
-                            focusManager.clearFocus()
-                            viewModel.deleteSubscription()
-                            isSaving = false
-                            onNavigateBack()
-                        }
-                    }
-                },
+                onClick = { if (!isSaving) showDeleteDialog = true },
                 enabled = !isSaving,
                 modifier = Modifier.fillMaxWidth(),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.error)
