@@ -77,6 +77,34 @@
     <string name="per_month">Per month</string>
     <string name="top_5_subscriptions">Your 5 Most Expensive</string>
 
+    <!-- Settings bottom sheet -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_name_section">Display name</string>
+    <string name="settings_name_update">Update</string>
+    <string name="settings_theme_section">Theme</string>
+    <string name="settings_language_section">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_basque">Euskera</string>
+    <string name="fab_settings">Settings</string>
+
+    <!-- Confirmation dialogs -->
+    <string name="confirm_delete_title">Delete subscription?</string>
+    <string name="confirm_delete_message">This action cannot be undone.</string>
+    <string name="confirm_cancel_title">Open cancellation page?</string>
+    <string name="confirm_cancel_message">This will open the cancellation page for %1$s in your browser.</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Validation errors -->
+    <string name="error_name_required">Name is required</string>
+    <string name="error_amount_invalid">Enter a valid amount greater than 0</string>
+    <string name="error_save_failed">Could not save. Please try again.</string>
+
+    <!-- Toast messages -->
+    <string name="notifications_enabled">Notifications enabled.</string>
+    <string name="notifications_denied">Permission denied. Reminders will not be sent.</string>
+    <string name="cancel_link_not_found">No cancellation link found for \'%1$s\'.</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Subscription Reminders</string>
     <string name="notification_channel_description">Channel for alerts before subscriptions renew.</string>

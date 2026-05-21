@@ -36,9 +36,18 @@ fun AddSubscriptionScreen(
     val formState by viewModel.formState.collectAsState()
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
     var isSaving by remember { mutableStateOf(false) }
+    var attemptedSave by remember { mutableStateOf(false) }
+
+    val nameError = attemptedSave && formState.name.isBlank()
+    val amountError = attemptedSave && (formState.amount.isBlank() || (formState.amount.toDoubleOrNull() ?: 0.0) <= 0)
+
+    val errorSaveMessage = stringResource(R.string.error_save_failed)
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.add_subscription_title)) },
@@ -60,13 +69,19 @@ fun AddSubscriptionScreen(
             ServiceNameInput(
                 viewModel = viewModel,
                 currentName = formState.name,
-                onNameChange = viewModel::onNameChange
+                onNameChange = viewModel::onNameChange,
+                isError = nameError,
+                errorMessage = stringResource(R.string.error_name_required)
             )
             OutlinedTextField(
                 value = formState.amount,
                 onValueChange = viewModel::onAmountChange,
                 label = { Text(stringResource(R.string.amount_hint)) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = amountError,
+                supportingText = if (amountError) {
+                    { Text(stringResource(R.string.error_amount_invalid), color = MaterialTheme.colorScheme.error) }
+                } else null
             )
             BillingCycleSelector(
                 selectedCycle = formState.billingCycle,
@@ -81,12 +96,21 @@ fun AddSubscriptionScreen(
 
             Button(
                 onClick = {
-                    if (!isSaving) {
+                    attemptedSave = true
+                    val hasErrors = formState.name.isBlank() ||
+                        formState.amount.isBlank() ||
+                        (formState.amount.toDoubleOrNull() ?: 0.0) <= 0
+                    if (!hasErrors && !isSaving) {
                         scope.launch {
                             isSaving = true
                             focusManager.clearFocus()
-                            viewModel.saveSubscription()
-                            onNavigateBack()
+                            val success = viewModel.saveSubscription()
+                            if (success) {
+                                onNavigateBack()
+                            } else {
+                                isSaving = false
+                                snackbarHostState.showSnackbar(errorSaveMessage)
+                            }
                         }
                     }
                 },
@@ -108,7 +132,9 @@ fun AddSubscriptionScreen(
 fun ServiceNameInput(
     viewModel: AddEditViewModel,
     currentName: String,
-    onNameChange: (String) -> Unit
+    onNameChange: (String) -> Unit,
+    isError: Boolean = false,
+    errorMessage: String = ""
 ) {
     val predefinedNames by viewModel.predefinedServiceNames.collectAsState()
     val otherOption = stringResource(R.string.other_option)
@@ -128,7 +154,11 @@ fun ServiceNameInput(
                 readOnly = true,
                 label = { Text(stringResource(R.string.service_name_label)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                isError = isError && !isManualInputVisible,
+                supportingText = if (isError && !isManualInputVisible) {
+                    { Text(errorMessage, color = MaterialTheme.colorScheme.error) }
+                } else null
             )
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -157,7 +187,11 @@ fun ServiceNameInput(
                 value = currentName,
                 onValueChange = onNameChange,
                 label = { Text(stringResource(R.string.manual_name_label)) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = isError,
+                supportingText = if (isError) {
+                    { Text(errorMessage, color = MaterialTheme.colorScheme.error) }
+                } else null
             )
         }
     }
@@ -187,9 +221,7 @@ fun BillingCycleSelector(
             readOnly = true,
             label = { Text(stringResource(R.string.billing_cycle_label)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
+            modifier = Modifier.menuAnchor().fillMaxWidth()
         )
         ExposedDropdownMenu(
             expanded = expanded,

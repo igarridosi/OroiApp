@@ -77,6 +77,34 @@
     <string name="per_month">Al mes</string>
     <string name="top_5_subscriptions">Tus 5 más caras</string>
 
+    <!-- Settings bottom sheet -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_name_section">Nombre de usuario</string>
+    <string name="settings_name_update">Actualizar</string>
+    <string name="settings_theme_section">Tema</string>
+    <string name="settings_language_section">Idioma</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_basque">Euskera</string>
+    <string name="fab_settings">Ajustes</string>
+
+    <!-- Confirmation dialogs -->
+    <string name="confirm_delete_title">¿Eliminar suscripción?</string>
+    <string name="confirm_delete_message">Esta acción no se puede deshacer.</string>
+    <string name="confirm_cancel_title">¿Abrir página de cancelación?</string>
+    <string name="confirm_cancel_message">Se abrirá la página de cancelación de %1$s en tu navegador.</string>
+    <string name="confirm">Confirmar</string>
+
+    <!-- Validation errors -->
+    <string name="error_name_required">El nombre es obligatorio</string>
+    <string name="error_amount_invalid">Introduce un importe válido mayor que 0</string>
+    <string name="error_save_failed">Error al guardar. Inténtalo de nuevo.</string>
+
+    <!-- Toast messages -->
+    <string name="notifications_enabled">Notificaciones activadas.</string>
+    <string name="notifications_denied">Permiso denegado. No se enviarán recordatorios.</string>
+    <string name="cancel_link_not_found">No se encontró enlace de cancelación para \'%1$s\'.</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Recordatorios de suscripciones</string>
     <string name="notification_channel_description">Canal de alertas antes de que se renueven las suscripciones.</string>

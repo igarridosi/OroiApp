@@ -77,6 +77,34 @@
     <string name="per_month">Hilean</string>
     <string name="top_5_subscriptions">Zure 5 Garestienak</string>
 
+    <!-- Settings bottom sheet -->
+    <string name="settings_title">Ezarpenak</string>
+    <string name="settings_name_section">Erabiltzaile izena</string>
+    <string name="settings_name_update">Eguneratu</string>
+    <string name="settings_theme_section">Gaia</string>
+    <string name="settings_language_section">Hizkuntza</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_basque">Euskera</string>
+    <string name="fab_settings">Ezarpenak</string>
+
+    <!-- Confirmation dialogs -->
+    <string name="confirm_delete_title">Harpidetza ezabatu?</string>
+    <string name="confirm_delete_message">Ekintza hau ezin da desegin.</string>
+    <string name="confirm_cancel_title">Ezeztapen orria ireki?</string>
+    <string name="confirm_cancel_message">%1$s-ren ezeztapen orria nabigatzailean irekiko da.</string>
+    <string name="confirm">Baieztatu</string>
+
+    <!-- Validation errors -->
+    <string name="error_name_required">Izena beharrezkoa da</string>
+    <string name="error_amount_invalid">Zenbateko balioduna sartu (0 baino handiagoa)</string>
+    <string name="error_save_failed">Ezin izan da gorde. Saiatu berriro.</string>
+
+    <!-- Toast messages -->
+    <string name="notifications_enabled">Jakinarazpenak aktibatuta.</string>
+    <string name="notifications_denied">Baimena ukatu da. Abisuak ez dira bidaliko.</string>
+    <string name="cancel_link_not_found">\'%1$s\'-rako ezeztapen estekarik ez da aurkitu.</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Harpidetzen Gogorarazpenak</string>
     <string name="notification_channel_description">Harpidetzak berritu baino lehen abisuak jasotzeko kanala.</string>

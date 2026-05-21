@@ -51,6 +51,7 @@ import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
@@ -96,15 +97,16 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dialogInput by viewModel.dialogUsernameInput.collectAsState()
-    var showThemeDialog by remember { mutableStateOf(false) }
+    var showSettingsSheet by remember { mutableStateOf(false) }
 
-    if (showThemeDialog) {
-        ThemeChooserDialog(
-            onDismiss = { showThemeDialog = false },
-            onThemeSelected = { newTheme ->
-                viewModel.changeTheme(newTheme)
-                showThemeDialog = false
-            }
+    if (showSettingsSheet) {
+        SettingsBottomSheet(
+            uiState = uiState,
+            currentLanguageTag = viewModel.getCurrentLanguageTag(),
+            onThemeSelected = viewModel::changeTheme,
+            onLanguageSelected = viewModel::changeLanguage,
+            onUsernameUpdated = viewModel::updateUsername,
+            onDismiss = { showSettingsSheet = false }
         )
     }
 
@@ -133,16 +135,15 @@ fun MainScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FloatingActionButton(
-                    onClick = { showThemeDialog = true },
+                    onClick = { showSettingsSheet = true },
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    val icon = when (uiState.currentTheme) {
-                        ThemeSetting.LIGHT -> Icons.Default.LightMode
-                        ThemeSetting.DARK -> Icons.Default.DarkMode
-                        ThemeSetting.SYSTEM -> Icons.Default.SettingsBrightness
-                    }
-                    Icon(icon, contentDescription = stringResource(R.string.fab_change_theme), tint = MaterialTheme.colorScheme.surface)
+                    Icon(
+                        Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.fab_settings),
+                        tint = MaterialTheme.colorScheme.surface
+                    )
                 }
 
                 FloatingActionButton(
@@ -319,6 +320,25 @@ fun SubscriptionList(
     onCancel: (Subscription) -> Unit,
     contentPadding: PaddingValues
 ) {
+    var pendingCancel by remember { mutableStateOf<Subscription?>(null) }
+
+    pendingCancel?.let { sub ->
+        AlertDialog(
+            onDismissRequest = { pendingCancel = null },
+            title = { Text(stringResource(R.string.confirm_cancel_title)) },
+            text = { Text(stringResource(R.string.confirm_cancel_message, sub.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onCancel(sub)
+                    pendingCancel = null
+                }) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingCancel = null }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
     if (subscriptions.isEmpty()) {
         Box(
             modifier = Modifier
@@ -365,7 +385,7 @@ fun SubscriptionList(
                                 return@rememberSwipeToDismissBoxState false
                             }
                             SwipeToDismissBoxValue.StartToEnd -> {
-                                onCancel(subscription)
+                                pendingCancel = subscription
                                 return@rememberSwipeToDismissBoxState false
                             }
                             else -> return@rememberSwipeToDismissBoxState false
