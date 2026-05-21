@@ -1,15 +1,17 @@
 package com.example.oroiapp
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,12 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.oroiapp.data.UserPreferencesRepository
 import com.example.oroiapp.ui.AddSubscriptionScreen
 import com.example.oroiapp.ui.EditSubscriptionScreen
 import com.example.oroiapp.ui.MainScreen
@@ -37,6 +41,7 @@ import com.example.oroiapp.viewmodel.EditSubscriptionViewModel
 import com.example.oroiapp.viewmodel.MainViewModel
 import com.example.oroiapp.viewmodel.OroiViewModelFactory
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,12 +52,37 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, getString(messageRes), Toast.LENGTH_SHORT).show()
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        val tag = newBase.getSharedPreferences(UserPreferencesRepository.PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(UserPreferencesRepository.LANGUAGE_TAG_KEY, "") ?: ""
+        if (tag.isEmpty()) {
+            super.attachBaseContext(newBase)
+        } else {
+            val locale = Locale.forLanguageTag(tag)
+            val config = Configuration(newBase.resources.configuration)
+            config.setLocale(locale)
+            super.attachBaseContext(newBase.createConfigurationContext(config))
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Suppress enter animation on Activity recreation (language change)
+        overridePendingTransition(0, 0)
         askNotificationPermission()
+
+        val mainViewModel = ViewModelProvider(this, OroiViewModelFactory)[MainViewModel::class.java]
+
+        // Observe language change: recreate instantly with no transition flash
+        lifecycleScope.launch {
+            mainViewModel.languageChangeEvent.collect {
+                recreate()
+                overridePendingTransition(0, 0)
+            }
+        }
+
         setContent {
-            val mainViewModel: MainViewModel = viewModel(factory = OroiViewModelFactory)
             val uiState by mainViewModel.uiState.collectAsState()
 
             OroiTheme(themeSetting = uiState.currentTheme) {

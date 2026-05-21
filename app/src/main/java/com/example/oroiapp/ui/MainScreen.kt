@@ -53,10 +53,15 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.mergeDescendants
+
 
 @Composable
 fun MainHeader(username: String) {
@@ -102,6 +107,7 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
     val dialogInput by viewModel.dialogUsernameInput.collectAsState()
     var showSettingsSheet by remember { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(false) }
 
     if (showSettingsSheet) {
         SettingsBottomSheet(
@@ -179,12 +185,24 @@ fun MainScreen(
             FilterChipRow(
                 currentFilter = uiState.currentFilter,
                 onFilterSelected = viewModel::updateFilter,
-                onStatsClick = onStatsClick
+                onStatsClick = onStatsClick,
+                showSearch = showSearch,
+                onSearchToggle = {
+                    showSearch = !showSearch
+                    if (!showSearch) viewModel.updateSearchQuery("")
+                }
             )
-            SubscriptionSearchBar(
-                query = uiState.searchQuery,
-                onQueryChange = viewModel::updateSearchQuery
-            )
+            AnimatedVisibility(
+                visible = showSearch,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                SubscriptionSearchBar(
+                    query = uiState.searchQuery,
+                    onQueryChange = viewModel::updateSearchQuery,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
             SubscriptionList(
                 subscriptions = uiState.subscriptions,
                 onEdit = onEditSubscription,
@@ -289,13 +307,16 @@ fun SubscriptionSearchBar(
 fun FilterChipRow(
     currentFilter: SubscriptionFilter,
     onFilterSelected: (SubscriptionFilter) -> Unit,
-    onStatsClick: () -> Unit
+    onStatsClick: () -> Unit,
+    showSearch: Boolean = false,
+    onSearchToggle: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ALFABETIKOA,
@@ -330,11 +351,28 @@ fun FilterChipRow(
                 labelColor = MaterialTheme.colorScheme.onPrimary
             )
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(
+            onClick = onSearchToggle,
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    if (showSearch) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.primaryContainer,
+                    CircleShape
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = stringResource(R.string.search_hint),
+                tint = if (showSearch) MaterialTheme.colorScheme.surface
+                       else MaterialTheme.colorScheme.onPrimary
+            )
+        }
         IconButton(
             onClick = onStatsClick,
             modifier = Modifier
-                .size(48.dp)
+                .size(40.dp)
                 .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
         ) {
             Icon(

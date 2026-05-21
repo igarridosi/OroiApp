@@ -59,12 +59,18 @@ class UserPreferencesRepository(context: Context) {
         prefs.edit().putString(BUDGET_KEY, budget.toString()).apply()
     }
 
+    fun saveLanguageTag(tag: String) {
+        prefs.edit().putString(LANGUAGE_TAG_KEY, tag).apply()
+    }
+
+    fun getLanguageTag(): String = prefs.getString(LANGUAGE_TAG_KEY, "") ?: ""
+
     companion object {
-        private const val PREFS_NAME = "OroiUserPrefs"
+        const val PREFS_NAME = "OroiUserPrefs"
         private const val USERNAME_KEY = "username"
         private const val IS_FIRST_LAUNCH_KEY = "is_first_launch"
-        // Gako berria gaia gordetzeko
         private const val THEME_SETTING_KEY = "theme_setting"
         private const val BUDGET_KEY = "monthly_budget"
+        const val LANGUAGE_TAG_KEY = "language_tag"
     }
 }

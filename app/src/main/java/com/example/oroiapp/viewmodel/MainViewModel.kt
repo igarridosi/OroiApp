@@ -1,7 +1,5 @@
 package com.example.oroiapp.viewmodel
 
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.oroiapp.data.SubscriptionDao
@@ -10,9 +8,12 @@ import com.example.oroiapp.data.UserPreferencesRepository
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.model.Subscription
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -133,18 +134,15 @@ class MainViewModel(
         }
     }
 
+    private val _languageChangeEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val languageChangeEvent: SharedFlow<Unit> = _languageChangeEvent.asSharedFlow()
+
     fun changeLanguage(tag: String) {
-        AppCompatDelegate.setApplicationLocales(
-            if (tag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
-            else LocaleListCompat.forLanguageTags(tag)
-        )
+        userPrefs.saveLanguageTag(tag)
+        _languageChangeEvent.tryEmit(Unit)
     }
 
-    fun getCurrentLanguageTag(): String {
-        val tags = AppCompatDelegate.getApplicationLocales().toLanguageTags()
-        if (tags.isBlank()) return "en"
-        return tags.split(",").firstOrNull()?.split("-")?.firstOrNull() ?: "en"
-    }
+    fun getCurrentLanguageTag(): String = userPrefs.getLanguageTag()
 
     fun updateFilter(filter: SubscriptionFilter) { _currentFilter.value = filter }
 
