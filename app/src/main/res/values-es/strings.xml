@@ -105,6 +105,17 @@
     <string name="notifications_denied">Permiso denegado. No se enviarán recordatorios.</string>
     <string name="cancel_link_not_found">No se encontró enlace de cancelación para \'%1$s\'.</string>
 
+    <!-- Search -->
+    <string name="search_hint">Buscar suscripciones…</string>
+    <string name="search_clear_description">Borrar búsqueda</string>
+
+    <!-- Accessibility -->
+    <string name="billing_badge_weekly_desc">Facturación semanal</string>
+    <string name="billing_badge_monthly_desc">Facturación mensual</string>
+    <string name="billing_badge_annual_desc">Facturación anual</string>
+    <string name="swipe_right_hint">Desliza a la derecha para abrir la página de cancelación</string>
+    <string name="swipe_left_hint">Desliza a la izquierda para editar</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Recordatorios de suscripciones</string>
     <string name="notification_channel_description">Canal de alertas antes de que se renueven las suscripciones.</string>

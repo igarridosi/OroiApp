@@ -105,6 +105,17 @@
     <string name="notifications_denied">Baimena ukatu da. Abisuak ez dira bidaliko.</string>
     <string name="cancel_link_not_found">\'%1$s\'-rako ezeztapen estekarik ez da aurkitu.</string>
 
+    <!-- Search -->
+    <string name="search_hint">Bilatu harpidetzak…</string>
+    <string name="search_clear_description">Garbitu bilaketa</string>
+
+    <!-- Accessibility -->
+    <string name="billing_badge_weekly_desc">Asteko fakturaketa</string>
+    <string name="billing_badge_monthly_desc">Hileko fakturaketa</string>
+    <string name="billing_badge_annual_desc">Urteko fakturaketa</string>
+    <string name="swipe_right_hint">Irristatu eskuinera ezeztapen orria irekitzeko</string>
+    <string name="swipe_left_hint">Irristatu ezkerrera editatzeko</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Harpidetzen Gogorarazpenak</string>
     <string name="notification_channel_description">Harpidetzak berritu baino lehen abisuak jasotzeko kanala.</string>

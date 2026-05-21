@@ -51,8 +51,12 @@ import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.mergeDescendants
 
 @Composable
 fun MainHeader(username: String) {
@@ -177,6 +181,10 @@ fun MainScreen(
                 onFilterSelected = viewModel::updateFilter,
                 onStatsClick = onStatsClick
             )
+            SubscriptionSearchBar(
+                query = uiState.searchQuery,
+                onQueryChange = viewModel::updateSearchQuery
+            )
             SubscriptionList(
                 subscriptions = uiState.subscriptions,
                 onEdit = onEditSubscription,
@@ -249,6 +257,32 @@ fun CostCard(title: String, amount: Double) {
             )
         }
     }
+}
+
+@Composable
+fun SubscriptionSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        placeholder = { Text(stringResource(R.string.search_hint)) },
+        leadingIcon = {
+            Icon(Icons.Default.Search, contentDescription = null)
+        },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.search_clear_description))
+                }
+            }
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -451,7 +485,9 @@ fun SubscriptionItem(subscription: Subscription) {
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {},
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -500,6 +536,11 @@ fun BillingCycleBadge(cycle: BillingCycle, modifier: Modifier = Modifier) {
         BillingCycle.MONTHLY -> stringResource(R.string.billing_badge_monthly)
         BillingCycle.ANNUAL -> stringResource(R.string.billing_badge_annual)
     }
+    val description = when (cycle) {
+        BillingCycle.WEEKLY -> stringResource(R.string.billing_badge_weekly_desc)
+        BillingCycle.MONTHLY -> stringResource(R.string.billing_badge_monthly_desc)
+        BillingCycle.ANNUAL -> stringResource(R.string.billing_badge_annual_desc)
+    }
     val color = when (cycle) {
         BillingCycle.WEEKLY -> MaterialTheme.colorScheme.onTertiary
         BillingCycle.MONTHLY -> MaterialTheme.colorScheme.onTertiaryContainer
@@ -511,6 +552,7 @@ fun BillingCycleBadge(cycle: BillingCycle, modifier: Modifier = Modifier) {
             .size(24.dp)
             .clip(CircleShape)
             .background(color)
+            .semantics { contentDescription = description }
     ) {
         Text(text = text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }

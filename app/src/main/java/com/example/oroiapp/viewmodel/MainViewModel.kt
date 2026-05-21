@@ -34,7 +34,8 @@ data class MainUiState(
     val showUsernameDialog: Boolean = false,
     val currentTheme: ThemeSetting = ThemeSetting.SYSTEM,
     val currentFilter: SubscriptionFilter = SubscriptionFilter.ALFABETIKOA,
-    val monthlyBudget: Double = 0.0
+    val monthlyBudget: Double = 0.0,
+    val searchQuery: String = ""
 )
 
 data class ChartData(
@@ -56,6 +57,8 @@ class MainViewModel(
     val dialogUsernameInput: StateFlow<String> = _dialogUsernameInput.asStateFlow()
     private val _currentFilter = MutableStateFlow(SubscriptionFilter.ALFABETIKOA)
     private val _monthlyBudget = MutableStateFlow(userPrefs.getMonthlyBudget())
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     val uiState: StateFlow<MainUiState> = combine(
         listOf(
@@ -64,7 +67,8 @@ class MainViewModel(
             _showUsernameDialog,
             _currentTheme,
             _currentFilter,
-            _monthlyBudget
+            _monthlyBudget,
+            _searchQuery
         )
     ) { args ->
         val subs = args[0] as List<Subscription>
@@ -73,9 +77,12 @@ class MainViewModel(
         val theme = args[3] as ThemeSetting
         val filter = args[4] as SubscriptionFilter
         val budget = args[5] as Double
-        val allCosts = calculateAllCosts(subs)
+        val query = args[6] as String
+        val filtered = if (query.isBlank()) subs
+                       else subs.filter { it.name.contains(query, ignoreCase = true) }
+        val allCosts = calculateAllCosts(filtered)
         MainUiState(
-            subscriptions = sortSubscriptions(subs, filter),
+            subscriptions = sortSubscriptions(filtered, filter),
             totalMonthlyCost = allCosts.monthly,
             totalAnnualCost = allCosts.annual,
             totalDailyCost = allCosts.daily,
@@ -83,7 +90,8 @@ class MainViewModel(
             showUsernameDialog = showDialog,
             currentTheme = theme,
             monthlyBudget = budget,
-            currentFilter = filter
+            currentFilter = filter,
+            searchQuery = query
         )
     }.stateIn(
         scope = viewModelScope,
@@ -139,6 +147,8 @@ class MainViewModel(
     }
 
     fun updateFilter(filter: SubscriptionFilter) { _currentFilter.value = filter }
+
+    fun updateSearchQuery(query: String) { _searchQuery.value = query }
 
     private fun sortSubscriptions(subscriptions: List<Subscription>, filter: SubscriptionFilter): List<Subscription> {
         return when (filter) {

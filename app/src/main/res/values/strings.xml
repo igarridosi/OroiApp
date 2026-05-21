@@ -105,6 +105,17 @@
     <string name="notifications_denied">Permission denied. Reminders will not be sent.</string>
     <string name="cancel_link_not_found">No cancellation link found for \'%1$s\'.</string>
 
+    <!-- Search -->
+    <string name="search_hint">Search subscriptions…</string>
+    <string name="search_clear_description">Clear search</string>
+
+    <!-- Accessibility -->
+    <string name="billing_badge_weekly_desc">Weekly billing</string>
+    <string name="billing_badge_monthly_desc">Monthly billing</string>
+    <string name="billing_badge_annual_desc">Annual billing</string>
+    <string name="swipe_right_hint">Swipe right to open cancellation page</string>
+    <string name="swipe_left_hint">Swipe left to edit</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Subscription Reminders</string>
     <string name="notification_channel_description">Channel for alerts before subscriptions renew.</string>
