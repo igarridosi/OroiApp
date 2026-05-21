@@ -1,6 +1,5 @@
 package com.example.oroiapp.ui
 
-import android.R
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -34,12 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.oroiapp.R
 import com.example.oroiapp.data.ThemeSetting
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.model.Subscription
@@ -52,8 +51,6 @@ import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.SystemUpdate
-import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
@@ -72,7 +69,7 @@ fun MainHeader(username: String) {
         )
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                text = "Ongi Etorri, ",
+                text = stringResource(R.string.welcome_greeting),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -84,7 +81,6 @@ fun MainHeader(username: String) {
                 color = MaterialTheme.colorScheme.primary
             )
         }
-
     }
 }
 
@@ -146,7 +142,7 @@ fun MainScreen(
                         ThemeSetting.DARK -> Icons.Default.DarkMode
                         ThemeSetting.SYSTEM -> Icons.Default.SettingsBrightness
                     }
-                    Icon(icon, contentDescription = "Aldatu Gaia", tint = MaterialTheme.colorScheme.surface)
+                    Icon(icon, contentDescription = stringResource(R.string.fab_change_theme), tint = MaterialTheme.colorScheme.surface)
                 }
 
                 FloatingActionButton(
@@ -154,7 +150,7 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Gehitu Harpidetza", tint = MaterialTheme.colorScheme.surface)
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.fab_add_subscription), tint = MaterialTheme.colorScheme.surface)
                 }
             }
         }
@@ -164,8 +160,7 @@ fun MainScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .padding(16.dp)
-        )   {
-            // Usamos el nuevo header
+        ) {
             MainHeader(username = uiState.username)
             Spacer(modifier = Modifier.height(24.dp))
             CostCarousel(uiState = uiState)
@@ -203,9 +198,9 @@ fun CostCarousel(uiState: MainUiState) {
             pageSpacing = 16.dp,
         ) { page ->
             when (page) {
-                0 -> CostCard(title = "Hileko Gastua", amount = uiState.totalMonthlyCost)
-                1 -> CostCard(title = "Urteko Gastua", amount = uiState.totalAnnualCost)
-                2 -> CostCard(title = "Eguneko Gastua", amount = uiState.totalDailyCost)
+                0 -> CostCard(title = stringResource(R.string.carousel_monthly_cost), amount = uiState.totalMonthlyCost)
+                1 -> CostCard(title = stringResource(R.string.carousel_annual_cost), amount = uiState.totalAnnualCost)
+                2 -> CostCard(title = stringResource(R.string.carousel_daily_cost), amount = uiState.totalDailyCost)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -230,8 +225,7 @@ fun CostCarousel(uiState: MainUiState) {
 @Composable
 fun CostCard(title: String, amount: Double) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -245,7 +239,6 @@ fun CostCard(title: String, amount: Double) {
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.surface
-
             )
             Text(
                 text = "€${"%.2f".format(amount)}",
@@ -272,7 +265,7 @@ fun FilterChipRow(
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ALFABETIKOA,
             onClick = { onFilterSelected(SubscriptionFilter.ALFABETIKOA) },
-            label = { Text("Alfabetikoa") },
+            label = { Text(stringResource(R.string.filter_alphabetical)) },
             colors = FilterChipDefaults.filterChipColors(
                 selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
                 selectedLabelColor = MaterialTheme.colorScheme.surface,
@@ -283,7 +276,7 @@ fun FilterChipRow(
         FilterChip(
             selected = currentFilter == SubscriptionFilter.ORDAINKETA_DATA,
             onClick = { onFilterSelected(SubscriptionFilter.ORDAINKETA_DATA) },
-            label = { Text("Data") },
+            label = { Text(stringResource(R.string.filter_date)) },
             colors = FilterChipDefaults.filterChipColors(
                 selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
                 selectedLabelColor = MaterialTheme.colorScheme.surface,
@@ -294,7 +287,7 @@ fun FilterChipRow(
         FilterChip(
             selected = currentFilter == SubscriptionFilter.PREZIOA,
             onClick = { onFilterSelected(SubscriptionFilter.PREZIOA) },
-            label = { Text("Prezioa") },
+            label = { Text(stringResource(R.string.filter_price)) },
             colors = FilterChipDefaults.filterChipColors(
                 selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
                 selectedLabelColor = MaterialTheme.colorScheme.surface,
@@ -303,7 +296,6 @@ fun FilterChipRow(
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
-        // ESTATISTIKA BOTOIA
         IconButton(
             onClick = onStatsClick,
             modifier = Modifier
@@ -312,7 +304,7 @@ fun FilterChipRow(
         ) {
             Icon(
                 imageVector = Icons.Default.BarChart,
-                contentDescription = "Estatistikak",
+                contentDescription = stringResource(R.string.stats_button_description),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }
@@ -340,13 +332,13 @@ fun SubscriptionList(
             ) {
                 Icon(
                     imageVector = Icons.Default.LinkOff,
-                    contentDescription = "Ez dago harpidetzarik",
+                    contentDescription = stringResource(R.string.empty_state_icon_description),
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Gehitu zure Harpidetzak '+' ikonoan",
+                    text = stringResource(R.string.empty_state_text),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -354,37 +346,28 @@ fun SubscriptionList(
             }
         }
     } else {
-        // Zerrendaren egoera (scroll-a) kontrolatzeko aldagaia sortu
         val listState = rememberLazyListState()
 
-        // 'subscriptions' zerrenda aldatzen den bakoitzean (filtroa aldatzean), kode hau exekutatuko da.
         LaunchedEffect(subscriptions) {
-            // Zerrendaren hasierara joango da
             listState.scrollToItem(0)
         }
 
         LazyColumn(
-            // Sortu dugun egoera LazyColumn-ari esleitu
             state = listState,
-            // Padding-a elementu bakoitzari emango diogu, ez zerrendari
             verticalArrangement = Arrangement.spacedBy(4.dp),
-
         ) {
             items(items = subscriptions, key = { it.id }) { subscription ->
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
                         when (it) {
-                            // Eskuinetik ezkerrera -> Editatu
                             SwipeToDismissBoxValue.EndToStart -> {
                                 onEdit(subscription.id)
-                                return@rememberSwipeToDismissBoxState false // Ez dugu elementua desagertzerik nahi
+                                return@rememberSwipeToDismissBoxState false
                             }
-                            // Ezkerretik eskuinera -> Ezeztatu ("Botoi Gorria")
                             SwipeToDismissBoxValue.StartToEnd -> {
                                 onCancel(subscription)
-                                return@rememberSwipeToDismissBoxState false // Ez dugu elementua desagertzerik nahi
+                                return@rememberSwipeToDismissBoxState false
                             }
-
                             else -> return@rememberSwipeToDismissBoxState false
                         }
                     }
@@ -399,28 +382,24 @@ fun SubscriptionList(
                     backgroundContent = {
                         val direction = dismissState.dismissDirection ?: return@SwipeToDismissBox
 
-                        // Definitu aldagaiak norabidearen arabera, modu argiagoan
                         val backgroundColor: Color
                         val icon: ImageVector
                         val alignment: Alignment
                         val tintColor: Color
 
                         when (direction) {
-                            // "Botoi Gorria" (Ezeztatu)
                             SwipeToDismissBoxValue.StartToEnd -> {
                                 backgroundColor = MaterialTheme.colorScheme.error
                                 icon = Icons.Default.AdsClick
                                 alignment = Alignment.CenterStart
                                 tintColor = MaterialTheme.colorScheme.onError
                             }
-                            // Editatzeko ekintza
                             SwipeToDismissBoxValue.EndToStart -> {
                                 backgroundColor = MaterialTheme.colorScheme.onPrimary
                                 icon = Icons.Default.Edit
                                 alignment = Alignment.CenterEnd
                                 tintColor = MaterialTheme.colorScheme.surface
                             }
-
                             else -> {
                                 backgroundColor = Color.Transparent
                                 icon = Icons.Default.Delete
@@ -435,11 +414,7 @@ fun SubscriptionList(
                                 .padding(horizontal = 20.dp),
                             contentAlignment = alignment
                         ) {
-                            Icon(
-                                icon,
-                                contentDescription = null,
-                                tint = tintColor
-                            )
+                            Icon(icon, contentDescription = null, tint = tintColor)
                         }
                     }
                 ) {
@@ -455,14 +430,12 @@ fun SubscriptionItem(subscription: Subscription) {
     val nextPaymentDate = calculateNextPaymentDate(subscription)
     val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
-    // Box-a kendu eta Card-a da elementu nagusia
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Box { // Box hau badge-a kokatzeko da
+        Box {
             Row(
                 modifier = Modifier
                     .padding(20.dp)
@@ -471,24 +444,30 @@ fun SubscriptionItem(subscription: Subscription) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(subscription.name,
+                    Text(
+                        subscription.name,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        "Hurrengo ordainketa: ${dateFormat.format(nextPaymentDate)}",
+                        stringResource(R.string.next_payment, dateFormat.format(nextPaymentDate)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                Text(text = "${subscription.amount} ${subscription.currency}", fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                Text(
+                    text = "${subscription.amount} ${subscription.currency}",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
             BillingCycleBadge(
                 cycle = subscription.billingCycle,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 8.dp, end = 8.dp) // Padding-a badge-ari
+                    .padding(top = 8.dp, end = 8.dp)
             )
         }
     }
@@ -496,10 +475,15 @@ fun SubscriptionItem(subscription: Subscription) {
 
 @Composable
 fun BillingCycleBadge(cycle: BillingCycle, modifier: Modifier = Modifier) {
-    val (text, color) = when (cycle) {
-        BillingCycle.WEEKLY -> Triple("A", MaterialTheme.colorScheme.onTertiary, MaterialTheme.colorScheme.onTertiaryContainer)
-        BillingCycle.MONTHLY -> Triple("H", MaterialTheme.colorScheme.onTertiaryContainer, MaterialTheme.colorScheme.onPrimary)
-        BillingCycle.ANNUAL -> Triple("U", MaterialTheme.colorScheme.onSecondary, MaterialTheme.colorScheme.onSecondary)
+    val text = when (cycle) {
+        BillingCycle.WEEKLY -> stringResource(R.string.billing_badge_weekly)
+        BillingCycle.MONTHLY -> stringResource(R.string.billing_badge_monthly)
+        BillingCycle.ANNUAL -> stringResource(R.string.billing_badge_annual)
+    }
+    val color = when (cycle) {
+        BillingCycle.WEEKLY -> MaterialTheme.colorScheme.onTertiary
+        BillingCycle.MONTHLY -> MaterialTheme.colorScheme.onTertiaryContainer
+        BillingCycle.ANNUAL -> MaterialTheme.colorScheme.onSecondary
     }
     Box(
         contentAlignment = Alignment.Center,
@@ -540,36 +524,36 @@ fun ThemeChooserDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Aukeratu Gaia") },
+        title = { Text(stringResource(R.string.dialog_choose_theme)) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextButton(onClick = { onThemeSelected(ThemeSetting.SYSTEM) }) {
-                    Text("Sistemaren Modua", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.theme_system), style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.SettingsBrightness,
-                        contentDescription = "Sistema",
+                        contentDescription = stringResource(R.string.theme_system_description),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 TextButton(onClick = { onThemeSelected(ThemeSetting.LIGHT) }) {
-                    Text("Modu Argia", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.theme_light), style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.LightMode,
-                        contentDescription = "Argia",
+                        contentDescription = stringResource(R.string.theme_light_description),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 TextButton(onClick = { onThemeSelected(ThemeSetting.DARK) }) {
-                    Text("Modu Iluna", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.theme_dark), style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.DarkMode,
-                        contentDescription = "Iluna",
+                        contentDescription = stringResource(R.string.theme_dark_description),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -583,7 +567,7 @@ fun ThemeChooserDialog(
                 TextButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Itxi",
+                        contentDescription = stringResource(R.string.close_description),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Oroi</string>
+
+    <!-- Common actions -->
+    <string name="back">Atrás</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="edit_description">Editar</string>
+    <string name="close_description">Cerrar</string>
+
+    <!-- Billing cycles -->
+    <string name="billing_weekly">Semanal</string>
+    <string name="billing_monthly">Mensual</string>
+    <string name="billing_annual">Anual</string>
+    <string name="billing_badge_weekly">S</string>
+    <string name="billing_badge_monthly">M</string>
+    <string name="billing_badge_annual">A</string>
+
+    <!-- Main Screen -->
+    <string name="welcome_greeting">Bienvenido/a, </string>
+    <string name="carousel_monthly_cost">Gasto Mensual</string>
+    <string name="carousel_annual_cost">Gasto Anual</string>
+    <string name="carousel_daily_cost">Gasto Diario</string>
+    <string name="filter_alphabetical">Alfabético</string>
+    <string name="filter_date">Fecha</string>
+    <string name="filter_price">Precio</string>
+    <string name="stats_button_description">Estadísticas</string>
+    <string name="fab_change_theme">Cambiar tema</string>
+    <string name="fab_add_subscription">Añadir suscripción</string>
+    <string name="empty_state_text">Añade tus suscripciones con el botón \'+\'</string>
+    <string name="empty_state_icon_description">Sin suscripciones</string>
+    <string name="next_payment">Próximo pago: %1$s</string>
+
+    <!-- Theme Dialog -->
+    <string name="dialog_choose_theme">Elegir tema</string>
+    <string name="theme_system">Modo del sistema</string>
+    <string name="theme_light">Modo claro</string>
+    <string name="theme_dark">Modo oscuro</string>
+    <string name="theme_system_description">Sistema</string>
+    <string name="theme_light_description">Claro</string>
+    <string name="theme_dark_description">Oscuro</string>
+
+    <!-- Add Subscription Screen -->
+    <string name="add_subscription_title">Añadir suscripción</string>
+    <string name="amount_hint">Importe (ej: 9,99)</string>
+    <string name="service_name_label">Nombre del servicio</string>
+    <string name="other_option">Otro…</string>
+    <string name="manual_name_label">Escribe el nombre de la suscripción</string>
+    <string name="billing_cycle_label">Ciclo de facturación</string>
+    <string name="first_payment_date_label">Fecha del primer pago</string>
+    <string name="pick_date_description">Seleccionar fecha</string>
+    <string name="save_subscription">Guardar suscripción</string>
+
+    <!-- Edit Subscription Screen -->
+    <string name="edit_subscription_title">Editar suscripción</string>
+    <string name="name_field_label">Nombre</string>
+    <string name="amount_field_label">Importe</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="delete_subscription">Eliminar suscripción</string>
+
+    <!-- Username Dialog -->
+    <string name="welcome_title">¡Bienvenido/a!</string>
+    <string name="username_prompt_text">Nos gustaría saber tu nombre.</string>
+    <string name="your_name_label">Tu nombre</string>
+
+    <!-- Budget -->
+    <string name="set_monthly_budget">Establecer presupuesto mensual</string>
+    <string name="monthly_budget_label">Presupuesto mensual</string>
+    <string name="budget_exceeded">¡Has superado tu presupuesto!</string>
+    <string name="set_monthly_limit_title">Establecer límite mensual</string>
+    <string name="amount_euros_label">Importe (€)</string>
+
+    <!-- Statistics Screen -->
+    <string name="top_expenses_title">Gastos principales</string>
+    <string name="no_data">No hay datos para mostrar.</string>
+    <string name="per_month">Al mes</string>
+    <string name="top_5_subscriptions">Tus 5 más caras</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Recordatorios de suscripciones</string>
+    <string name="notification_channel_description">Canal de alertas antes de que se renueven las suscripciones.</string>
+    <string name="notification_title">%1$s está a punto de renovarse</string>
+    <string name="notification_content">Se renueva en 2 días. Cancelarlo te ahorraría €%1$.2f al año.</string>
+</resources>

@@ -1,3 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OroiApp</string>
+    <string name="app_name">Oroi</string>
+
+    <!-- Common actions -->
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit_description">Edit</string>
+    <string name="close_description">Close</string>
+
+    <!-- Billing cycles -->
+    <string name="billing_weekly">Weekly</string>
+    <string name="billing_monthly">Monthly</string>
+    <string name="billing_annual">Annual</string>
+    <string name="billing_badge_weekly">W</string>
+    <string name="billing_badge_monthly">M</string>
+    <string name="billing_badge_annual">Y</string>
+
+    <!-- Main Screen -->
+    <string name="welcome_greeting">Welcome, </string>
+    <string name="carousel_monthly_cost">Monthly Cost</string>
+    <string name="carousel_annual_cost">Annual Cost</string>
+    <string name="carousel_daily_cost">Daily Cost</string>
+    <string name="filter_alphabetical">Alphabetical</string>
+    <string name="filter_date">Date</string>
+    <string name="filter_price">Price</string>
+    <string name="stats_button_description">Statistics</string>
+    <string name="fab_change_theme">Change Theme</string>
+    <string name="fab_add_subscription">Add Subscription</string>
+    <string name="empty_state_text">Add your subscriptions with the \'+\' button</string>
+    <string name="empty_state_icon_description">No subscriptions</string>
+    <string name="next_payment">Next payment: %1$s</string>
+
+    <!-- Theme Dialog -->
+    <string name="dialog_choose_theme">Choose Theme</string>
+    <string name="theme_system">System Mode</string>
+    <string name="theme_light">Light Mode</string>
+    <string name="theme_dark">Dark Mode</string>
+    <string name="theme_system_description">System</string>
+    <string name="theme_light_description">Light</string>
+    <string name="theme_dark_description">Dark</string>
+
+    <!-- Add Subscription Screen -->
+    <string name="add_subscription_title">Add Subscription</string>
+    <string name="amount_hint">Amount (e.g. 9.99)</string>
+    <string name="service_name_label">Service Name</string>
+    <string name="other_option">Other…</string>
+    <string name="manual_name_label">Enter subscription name</string>
+    <string name="billing_cycle_label">Billing Cycle</string>
+    <string name="first_payment_date_label">First Payment Date</string>
+    <string name="pick_date_description">Pick date</string>
+    <string name="save_subscription">Save Subscription</string>
+
+    <!-- Edit Subscription Screen -->
+    <string name="edit_subscription_title">Edit Subscription</string>
+    <string name="name_field_label">Name</string>
+    <string name="amount_field_label">Amount</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="delete_subscription">Delete Subscription</string>
+
+    <!-- Username Dialog -->
+    <string name="welcome_title">Welcome!</string>
+    <string name="username_prompt_text">We\'d like to know your name.</string>
+    <string name="your_name_label">Your name</string>
+
+    <!-- Budget -->
+    <string name="set_monthly_budget">Set Monthly Budget</string>
+    <string name="monthly_budget_label">Monthly Budget</string>
+    <string name="budget_exceeded">You\'ve exceeded your budget!</string>
+    <string name="set_monthly_limit_title">Set Monthly Limit</string>
+    <string name="amount_euros_label">Amount (€)</string>
+
+    <!-- Statistics Screen -->
+    <string name="top_expenses_title">Top Expenses</string>
+    <string name="no_data">No data to display.</string>
+    <string name="per_month">Per month</string>
+    <string name="top_5_subscriptions">Your 5 Most Expensive</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Subscription Reminders</string>
+    <string name="notification_channel_description">Channel for alerts before subscriptions renew.</string>
+    <string name="notification_title">%1$s is about to renew</string>
+    <string name="notification_content">It renews in 2 days. Cancelling would save you €%1$.2f per year.</string>
 </resources>

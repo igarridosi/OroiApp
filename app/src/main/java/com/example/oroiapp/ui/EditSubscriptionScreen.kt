@@ -7,11 +7,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.oroiapp.R
 import com.example.oroiapp.viewmodel.EditSubscriptionViewModel
 import kotlinx.coroutines.launch
 
@@ -29,10 +29,10 @@ fun EditSubscriptionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Editatu Harpidetza") },
+                title = { Text(stringResource(R.string.edit_subscription_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atzera")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -51,13 +51,13 @@ fun EditSubscriptionScreen(
             OutlinedTextField(
                 value = formState.name,
                 onValueChange = viewModel::onNameChange,
-                label = { Text("Izena") },
+                label = { Text(stringResource(R.string.name_field_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = formState.amount,
                 onValueChange = viewModel::onAmountChange,
-                label = { Text("Kopurua") },
+                label = { Text(stringResource(R.string.amount_field_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
             BillingCycleSelector(
@@ -71,7 +71,6 @@ fun EditSubscriptionScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Gordetzeko botoia
             Button(
                 onClick = {
                     if (!isSaving) {
@@ -87,11 +86,14 @@ fun EditSubscriptionScreen(
                 enabled = !isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Gorde Aldaketak", color = MaterialTheme.colorScheme.surface, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.save_changes),
+                    color = MaterialTheme.colorScheme.surface,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
-            // Ezabatu botoia
-            OutlinedButton (
+            OutlinedButton(
                 onClick = {
                     if (!isSaving) {
                         scope.launch {
@@ -107,7 +109,11 @@ fun EditSubscriptionScreen(
                 modifier = Modifier.fillMaxWidth(),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.error)
             ) {
-                Text("Ezabatu Harpidetza", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.delete_subscription),
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }

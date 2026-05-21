@@ -14,19 +14,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.oroiapp.R
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.viewmodel.AddEditViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Date
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.launch
 import com.example.oroiapp.ui.theme.*
 
-private const val OTHER_OPTION = "Beste bat..."
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSubscriptionScreen(
@@ -34,7 +34,6 @@ fun AddSubscriptionScreen(
     onNavigateBack: () -> Unit
 ) {
     val formState by viewModel.formState.collectAsState()
-
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var isSaving by remember { mutableStateOf(false) }
@@ -42,10 +41,10 @@ fun AddSubscriptionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Gehitu Harpidetza") },
+                title = { Text(stringResource(R.string.add_subscription_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atzera")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -66,11 +65,13 @@ fun AddSubscriptionScreen(
             OutlinedTextField(
                 value = formState.amount,
                 onValueChange = viewModel::onAmountChange,
-                label = { Text("Kopurua (Ad: 9.99)") },
+                label = { Text(stringResource(R.string.amount_hint)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            BillingCycleSelector(selectedCycle = formState.billingCycle, onCycleSelected = viewModel::onBillingCycleChange)
+            BillingCycleSelector(
+                selectedCycle = formState.billingCycle,
+                onCycleSelected = viewModel::onBillingCycleChange
+            )
             DatePickerField(
                 selectedDate = formState.firstPaymentDate,
                 onDateSelected = viewModel::onDateChange
@@ -82,16 +83,22 @@ fun AddSubscriptionScreen(
                 onClick = {
                     if (!isSaving) {
                         scope.launch {
-                            isSaving = true // 1. Desgaitu botoia
-                            focusManager.clearFocus() // 2. Ezkutatu teklatua
-                            viewModel.saveSubscription() // 3. Gorde (eta itxaron)
-                            onNavigateBack() // 4. Nabigatu
+                            isSaving = true
+                            focusManager.clearFocus()
+                            viewModel.saveSubscription()
+                            onNavigateBack()
                         }
                     }
                 },
-                enabled = !isSaving, // Botoiaren egoera lotu
+                enabled = !isSaving,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Gorde Harpidetza", color = MaterialTheme.colorScheme.surface, fontWeight = FontWeight.SemiBold) }
+            ) {
+                Text(
+                    stringResource(R.string.save_subscription),
+                    color = MaterialTheme.colorScheme.surface,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
@@ -103,13 +110,11 @@ fun ServiceNameInput(
     currentName: String,
     onNameChange: (String) -> Unit
 ) {
-    // Lortu ViewModel-etik aurrez definitutako zerbitzuen zerrenda
     val predefinedNames by viewModel.predefinedServiceNames.collectAsState()
-    // Gehitu "Beste bat..." aukera zerrendari
-    val dropdownOptions = predefinedNames + OTHER_OPTION
+    val otherOption = stringResource(R.string.other_option)
+    val dropdownOptions = predefinedNames + otherOption
 
     var expanded by remember { mutableStateOf(false) }
-    // Egoera honek kontrolatzen du eskuzko testu-eremua ikusgai dagoen ala ez
     var isManualInputVisible by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -118,10 +123,10 @@ fun ServiceNameInput(
             onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
-                value = if (isManualInputVisible) OTHER_OPTION else currentName,
+                value = if (isManualInputVisible) otherOption else currentName,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Zerbitzuaren Izena") },
+                label = { Text(stringResource(R.string.service_name_label)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor().fillMaxWidth()
             )
@@ -133,12 +138,12 @@ fun ServiceNameInput(
                     DropdownMenuItem(
                         text = { Text(serviceName) },
                         onClick = {
-                            if (serviceName == OTHER_OPTION) {
+                            if (serviceName == otherOption) {
                                 isManualInputVisible = true
-                                onNameChange("") // Garbitu izena eskuz idazteko
+                                onNameChange("")
                             } else {
                                 isManualInputVisible = false
-                                onNameChange(serviceName) // Eguneratu izena hautatutakoarekin
+                                onNameChange(serviceName)
                             }
                             expanded = false
                         }
@@ -147,12 +152,11 @@ fun ServiceNameInput(
             }
         }
 
-        // Eskuzko testu-eremua "Beste bat..." hautatzean bakarrik agertzen da, animazioarekin
         AnimatedVisibility(visible = isManualInputVisible) {
             OutlinedTextField(
                 value = currentName,
                 onValueChange = onNameChange,
-                label = { Text("Idatzi harpidetzaren izena") },
+                label = { Text(stringResource(R.string.manual_name_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -175,13 +179,13 @@ fun BillingCycleSelector(
     ) {
         OutlinedTextField(
             value = when (selectedCycle) {
-                BillingCycle.WEEKLY -> "Astero"
-                BillingCycle.MONTHLY -> "Hilero"
-                BillingCycle.ANNUAL -> "Urtero"
+                BillingCycle.WEEKLY -> stringResource(R.string.billing_weekly)
+                BillingCycle.MONTHLY -> stringResource(R.string.billing_monthly)
+                BillingCycle.ANNUAL -> stringResource(R.string.billing_annual)
             },
             onValueChange = {},
             readOnly = true,
-            label = { Text("Fakturazio Zikloa") },
+            label = { Text(stringResource(R.string.billing_cycle_label)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
@@ -197,9 +201,9 @@ fun BillingCycleSelector(
                     text = {
                         Text(
                             when (cycle) {
-                                BillingCycle.WEEKLY -> "Astero"
-                                BillingCycle.MONTHLY -> "Hilero"
-                                BillingCycle.ANNUAL -> "Urtero"
+                                BillingCycle.WEEKLY -> stringResource(R.string.billing_weekly)
+                                BillingCycle.MONTHLY -> stringResource(R.string.billing_monthly)
+                                BillingCycle.ANNUAL -> stringResource(R.string.billing_annual)
                             },
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -208,7 +212,7 @@ fun BillingCycleSelector(
                     onClick = {
                         onCycleSelected(cycle)
                         expanded = false
-                    },
+                    }
                 )
             }
         }
@@ -229,6 +233,8 @@ fun DatePickerField(
     val day = calendar.get(Calendar.DAY_OF_MONTH)
 
     val dateFormat = remember { SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()) }
+    val pickDateDesc = stringResource(R.string.pick_date_description)
+    val firstPaymentLabel = stringResource(R.string.first_payment_date_label)
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -243,9 +249,9 @@ fun DatePickerField(
         value = dateFormat.format(selectedDate),
         onValueChange = {},
         readOnly = true,
-        label = { Text("Lehen Ordainketa Eguna") },
+        label = { Text(firstPaymentLabel) },
         trailingIcon = {
-            Icon(Icons.Default.DateRange, "Hautatu data", Modifier.clickable { datePickerDialog.show() })
+            Icon(Icons.Default.DateRange, pickDateDesc, Modifier.clickable { datePickerDialog.show() })
         },
         modifier = Modifier.fillMaxWidth(),
     )

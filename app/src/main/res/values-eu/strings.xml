@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Oroi</string>
+
+    <!-- Common actions -->
+    <string name="back">Atzera</string>
+    <string name="save">Gorde</string>
+    <string name="cancel">Ezeztatu</string>
+    <string name="edit_description">Editatu</string>
+    <string name="close_description">Itxi</string>
+
+    <!-- Billing cycles -->
+    <string name="billing_weekly">Astero</string>
+    <string name="billing_monthly">Hilero</string>
+    <string name="billing_annual">Urtero</string>
+    <string name="billing_badge_weekly">A</string>
+    <string name="billing_badge_monthly">H</string>
+    <string name="billing_badge_annual">U</string>
+
+    <!-- Main Screen -->
+    <string name="welcome_greeting">Ongi Etorri, </string>
+    <string name="carousel_monthly_cost">Hileko Gastua</string>
+    <string name="carousel_annual_cost">Urteko Gastua</string>
+    <string name="carousel_daily_cost">Eguneko Gastua</string>
+    <string name="filter_alphabetical">Alfabetikoa</string>
+    <string name="filter_date">Data</string>
+    <string name="filter_price">Prezioa</string>
+    <string name="stats_button_description">Estatistikak</string>
+    <string name="fab_change_theme">Aldatu Gaia</string>
+    <string name="fab_add_subscription">Gehitu Harpidetza</string>
+    <string name="empty_state_text">Gehitu zure Harpidetzak \'+\' ikonoan</string>
+    <string name="empty_state_icon_description">Ez dago harpidetzarik</string>
+    <string name="next_payment">Hurrengo ordainketa: %1$s</string>
+
+    <!-- Theme Dialog -->
+    <string name="dialog_choose_theme">Aukeratu Gaia</string>
+    <string name="theme_system">Sistemaren Modua</string>
+    <string name="theme_light">Modu Argia</string>
+    <string name="theme_dark">Modu Iluna</string>
+    <string name="theme_system_description">Sistema</string>
+    <string name="theme_light_description">Argia</string>
+    <string name="theme_dark_description">Iluna</string>
+
+    <!-- Add Subscription Screen -->
+    <string name="add_subscription_title">Gehitu Harpidetza</string>
+    <string name="amount_hint">Kopurua (Ad: 9.99)</string>
+    <string name="service_name_label">Zerbitzuaren Izena</string>
+    <string name="other_option">Beste bat…</string>
+    <string name="manual_name_label">Idatzi harpidetzaren izena</string>
+    <string name="billing_cycle_label">Fakturazio Zikloa</string>
+    <string name="first_payment_date_label">Lehen Ordainketa Eguna</string>
+    <string name="pick_date_description">Hautatu data</string>
+    <string name="save_subscription">Gorde Harpidetza</string>
+
+    <!-- Edit Subscription Screen -->
+    <string name="edit_subscription_title">Editatu Harpidetza</string>
+    <string name="name_field_label">Izena</string>
+    <string name="amount_field_label">Kopurua</string>
+    <string name="save_changes">Gorde Aldaketak</string>
+    <string name="delete_subscription">Ezabatu Harpidetza</string>
+
+    <!-- Username Dialog -->
+    <string name="welcome_title">Ongi Etorri!</string>
+    <string name="username_prompt_text">Zure izena jakin nahiko genuke.</string>
+    <string name="your_name_label">Zure izena</string>
+
+    <!-- Budget -->
+    <string name="set_monthly_budget">Ezarri Hileko Aurrekontua</string>
+    <string name="monthly_budget_label">Hileko Aurrekontua</string>
+    <string name="budget_exceeded">Aurrekontua gainditu duzu!</string>
+    <string name="set_monthly_limit_title">Ezarri Hileko Muga</string>
+    <string name="amount_euros_label">Zenbatekoa (€)</string>
+
+    <!-- Statistics Screen -->
+    <string name="top_expenses_title">Gastu Nagusiak</string>
+    <string name="no_data">Ez dago daturik erakusteko.</string>
+    <string name="per_month">Hilean</string>
+    <string name="top_5_subscriptions">Zure 5 Garestienak</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Harpidetzen Gogorarazpenak</string>
+    <string name="notification_channel_description">Harpidetzak berritu baino lehen abisuak jasotzeko kanala.</string>
+    <string name="notification_title">%1$s berritzear dago</string>
+    <string name="notification_content">Bi egun barru berrituko da. Ezeztatuz gero, €%1$.2f aurreztuko zenituzke urtean.</string>
+</resources>
