@@ -1,6 +1,5 @@
 package com.example.oroiapp.ui
 
-import android.graphics.Paint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -19,22 +18,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.oroiapp.R
 import com.example.oroiapp.viewmodel.ChartData
 import com.example.oroiapp.viewmodel.MainViewModel
 import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,10 +46,10 @@ fun StatisticsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Gastu Nagusiak") },
+                title = { Text(stringResource(R.string.top_expenses_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atzera")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -72,19 +66,16 @@ fun StatisticsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (chartData.isNotEmpty()) {
-                // GRAFIKO INTERAKTIBOA
                 InteractivePieChart(
                     data = chartData,
                     colors = chartColors,
-                    modifier = Modifier.size(300.dp) // Tamaina apur bat handitu dugu
+                    modifier = Modifier.size(300.dp)
                 )
-
                 Spacer(modifier = Modifier.height(32.dp))
-
                 ChartLegend(data = chartData, colors = chartColors)
             } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Ez dago daturik erakusteko.", color = Color.Gray)
+                    Text(stringResource(R.string.no_data), color = Color.Gray)
                 }
             }
         }
@@ -96,7 +87,7 @@ fun InteractivePieChart(
     data: List<ChartData>,
     colors: List<Color>,
     modifier: Modifier = Modifier,
-    chartBarWidth: Dp = 35.dp // Oinarrizko lodiera
+    chartBarWidth: Dp = 35.dp
 ) {
     val totalSum = data.sumOf { it.value.toDouble() }.toFloat()
     var selectedIndex by remember { mutableStateOf(-1) }
@@ -104,8 +95,8 @@ fun InteractivePieChart(
     val animatedStrokeWidths = data.mapIndexed { index, _ ->
         val isSelected = index == selectedIndex
         animateDpAsState(
-            targetValue = if (isSelected) chartBarWidth * 1.6f else chartBarWidth, // Hautatua %60 lodiagoa
-            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing), // Animazio leuna eta naturala
+            targetValue = if (isSelected) chartBarWidth * 1.6f else chartBarWidth,
+            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
             label = "strokeWidth_$index"
         )
     }
@@ -114,16 +105,8 @@ fun InteractivePieChart(
         val isSelected = index == selectedIndex
         val isAnySelected = selectedIndex != -1
         val originalColor = colors.getOrElse(index) { Color.Gray }
-
-        // Kolore "itzalia" (gris argi gardena)
         val dimmedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-
-        val targetColor = if (isAnySelected && !isSelected) {
-            dimmedColor
-        } else {
-            originalColor
-        }
-
+        val targetColor = if (isAnySelected && !isSelected) dimmedColor else originalColor
         animateColorAsState(
             targetValue = targetColor,
             animationSpec = tween(durationMillis = 400),
@@ -135,6 +118,9 @@ fun InteractivePieChart(
         data.map { (it.value / totalSum) * 360f }
     }
 
+    val perMonthLabel = stringResource(R.string.per_month)
+    val top5Label = stringResource(R.string.top_5_subscriptions)
+
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Canvas(
             modifier = Modifier
@@ -144,10 +130,8 @@ fun InteractivePieChart(
                         val center = Offset(size.width / 2f, size.height / 2f)
                         val vec = tapOffset - center
                         val dist = vec.getDistance()
-
-                        // Erradioak kalkulatu detekziorako (gutxi gorabeherakoak)
                         val outerRadius = size.width / 2f
-                        val innerRadius = outerRadius - (chartBarWidth.toPx() * 2f) // Marjina handiagoa eman klik egiteko erraztasunerako
+                        val innerRadius = outerRadius - (chartBarWidth.toPx() * 2f)
 
                         if (dist < innerRadius || dist > outerRadius) {
                             selectedIndex = -1
@@ -171,19 +155,14 @@ fun InteractivePieChart(
                 }
         ) {
             var startAngle = -90f
-
             data.forEachIndexed { index, _ ->
                 val sweepAngle = sweepAngles[index]
-
-                // Animazio balioak irakurri
                 val strokeWidth = animatedStrokeWidths[index].value.toPx()
                 val color = animatedColors[index].value
-
-                // Marraztu
                 drawArc(
                     color = color,
                     startAngle = startAngle,
-                    sweepAngle = sweepAngle, // Angelua apur bat murriztu daiteke tarteak uzteko (-2f), baina horrela ere ondo dago
+                    sweepAngle = sweepAngle,
                     useCenter = false,
                     style = Stroke(width = strokeWidth)
                 )
@@ -202,12 +181,12 @@ fun InteractivePieChart(
                 )
                 Text(
                     text = "${"%.2f".format(item.value)}€",
-                    style = MaterialTheme.typography.headlineMedium, // Handiagoa
+                    style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Hilean",
+                    text = perMonthLabel,
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray
                 )
@@ -215,7 +194,7 @@ fun InteractivePieChart(
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Zure 5 Harpidetz Garestienak",
+                    text = top5Label,
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.Gray
                 )
