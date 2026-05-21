@@ -22,6 +22,7 @@ fun SettingsBottomSheet(
     onThemeSelected: (ThemeSetting) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onUsernameUpdated: (String) -> Unit,
+    onExportCsv: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -110,6 +111,21 @@ fun SettingsBottomSheet(
                     label = label,
                     selected = currentLanguageTag == tag,
                     onClick = { onLanguageSelected(tag) }
+                )
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
+
+            // ── DATA SECTION ──────────────────────────────────────────────
+            SectionLabel(stringResource(R.string.settings_data_section))
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onExportCsv,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    stringResource(R.string.export_csv),
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }

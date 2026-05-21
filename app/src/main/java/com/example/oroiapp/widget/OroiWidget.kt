@@ -2,6 +2,7 @@ package com.example.oroiapp.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -40,12 +41,14 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.example.oroiapp.MainActivity
 import com.example.oroiapp.R
+import com.example.oroiapp.data.UserPreferencesRepository
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.model.Subscription
 import com.example.oroiapp.viewmodel.OroiViewModelFactory
 import kotlinx.coroutines.flow.first
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.glance.appwidget.CircularProgressIndicator
@@ -62,43 +65,45 @@ val IsLoadingKey = booleanPreferencesKey("is_loading")
 class OroiWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        // EGOERA LORTU
         val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
-        val isLoading = prefs[IsLoadingKey] ?: false // Lehenetsita false
+        val isLoading = prefs[IsLoadingKey] ?: false
 
-        // 1. DATUAK LORTU
         val dao = OroiViewModelFactory.dao
-
         val allSubs = try {
             dao.getAllSubscriptions().first()
         } catch (e: Exception) {
             emptyList()
         }
 
-        // 2. FILTRATU ETA ORDENATU
-        // Bakarrik hilerokoak, datak kalkulatu, ordenatu eta lehenengo 4ak hartu
+        // Show all billing cycles sorted by days until next payment, top 4
         val targetSubs = allSubs
-            .filter { it.billingCycle == BillingCycle.MONTHLY }
             .map { sub ->
                 val nextDate = calculateNextPayment(sub)
                 val daysLeft = calculateDaysLeft(nextDate)
                 Triple(sub, nextDate, daysLeft)
             }
-            .sortedBy { it.third } // Egun gutxien falta zaiena lehenengo
+            .sortedBy { it.third }
             .take(4)
+
+        // Localised strings from saved language preference
+        val localCtx = getLocalizedContext(context)
+        val emptyText = localCtx.getString(R.string.widget_empty_text)
 
         provideContent {
             GlanceTheme {
-                // Pasatu 'isLoading' WidgetContent-era
-                WidgetContent(targetSubs, isLoading)
+                WidgetContent(targetSubs, isLoading, emptyText, localCtx)
             }
         }
     }
 
     @SuppressLint("RestrictedApi")
     @Composable
-    private fun WidgetContent(subs: List<Triple<Subscription, Date, Long>>, isLoading: Boolean) {
-        // Diseinuaren Koloreak
+    private fun WidgetContent(
+        subs: List<Triple<Subscription, Date, Long>>,
+        isLoading: Boolean,
+        emptyText: String,
+        context: Context
+    ) {
         val BackgroundPurple = Color(0xFF7A40F2)
         val DarkPurpleTrack = Color(0xFF4A2092)
         val LightPurpleProgress = Color(0xFFD0C8FF)
@@ -108,22 +113,19 @@ class OroiWidget : GlanceAppWidget() {
                 .fillMaxSize()
                 .background(BackgroundPurple)
                 .padding(12.dp)
-                .clickable(actionStartActivity<MainActivity>()) // Widget osoak app-a irekitzen du
+                .clickable(actionStartActivity<MainActivity>())
         ) {
             Column(
                 modifier = GlanceModifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // --- GOIBURUA (Logo + Refresh) ---
+                // Header: logo + refresh button
                 Row(
                     modifier = GlanceModifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Ezkerrean espazio hutsa orekatzeko
                     Spacer(modifier = GlanceModifier.size(24.dp))
-
-                    // Logo erdian
                     Box(modifier = GlanceModifier.defaultWeight(), contentAlignment = Alignment.Center) {
                         Image(
                             provider = ImageProvider(R.drawable.oroi_logo_white),
@@ -131,7 +133,6 @@ class OroiWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.size(64.dp)
                         )
                     }
-
                     Image(
                         provider = ImageProvider(android.R.drawable.ic_popup_sync),
                         contentDescription = "Refresh",
@@ -146,18 +147,18 @@ class OroiWidget : GlanceAppWidget() {
                 if (subs.isEmpty()) {
                     Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "Ez dago hileko harpidetzarik",
+                            text = emptyText,
                             style = TextStyle(color = ColorProvider(Color.White))
                         )
                     }
                 } else {
-                    // ZERRENDA
                     subs.forEach { (sub, _, daysLeft) ->
                         SubscriptionRow(
                             sub = sub,
                             daysLeft = daysLeft,
                             trackColor = DarkPurpleTrack,
-                            progressColor = LightPurpleProgress
+                            progressColor = LightPurpleProgress,
+                            context = context
                         )
                         Spacer(modifier = GlanceModifier.height(8.dp))
                     }
@@ -172,17 +173,29 @@ class OroiWidget : GlanceAppWidget() {
         sub: Subscription,
         daysLeft: Long,
         trackColor: Color,
-        progressColor: Color
+        progressColor: Color,
+        context: Context
     ) {
-        // Progresoaren kalkulua (30 eguneko zikloa)
-        val progress = ((30 - daysLeft).toFloat() / 30f).coerceIn(0f, 1f)
-        val annualCost = sub.amount * 12
+        val cycleDays = when (sub.billingCycle) {
+            BillingCycle.WEEKLY -> 7f
+            BillingCycle.MONTHLY -> 30f
+            BillingCycle.ANNUAL -> 365f
+        }
+        // Progress fills as renewal approaches: 0 = just renewed, 1 = renews today
+        val progress = ((cycleDays - daysLeft) / cycleDays).coerceIn(0f, 1f)
+
+        val daysText = context.getString(R.string.widget_days_left, daysLeft)
+        val cycleTag = when (sub.billingCycle) {
+            BillingCycle.WEEKLY -> context.getString(R.string.billing_badge_weekly)
+            BillingCycle.MONTHLY -> context.getString(R.string.billing_badge_monthly)
+            BillingCycle.ANNUAL -> context.getString(R.string.billing_badge_annual)
+        }
 
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 1. IZENA
+            // Name
             Text(
                 text = sub.name,
                 style = TextStyle(
@@ -194,32 +207,27 @@ class OroiWidget : GlanceAppWidget() {
                 maxLines = 1
             )
 
-            // 2. PROGRESO BARRA + PREZIOA
-            // Box bat erabiltzen dugu barra eta testua gainjartzeko
+            // Progress bar with amount overlay
             Box(
                 modifier = GlanceModifier
-                    .defaultWeight() // Hartu libre dagoen espazio guztia
+                    .defaultWeight()
                     .height(20.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
-                // A) PROGRESO BARRA OFIZIALA
-                // Glance-k badu osagai hau, eta cornerRadius onartzen du
                 LinearProgressIndicator(
                     progress = progress,
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .cornerRadius(8.dp), // <-- ERTZ BIRIBILAK HEMEN APLIKATU
+                        .cornerRadius(8.dp),
                     color = ColorProvider(progressColor),
                     backgroundColor = ColorProvider(trackColor)
                 )
-
-                // B) TESTUA (Prezioa) - Barraren gainean (Eskuinean)
                 Box(
                     modifier = GlanceModifier.fillMaxSize(),
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     Text(
-                        text = "${annualCost.toInt()}€",
+                        text = "${sub.amount.toInt()}€ $cycleTag",
                         style = TextStyle(
                             color = ColorProvider(Color.White),
                             fontSize = 10.sp,
@@ -232,60 +240,60 @@ class OroiWidget : GlanceAppWidget() {
 
             Spacer(modifier = GlanceModifier.width(8.dp))
 
-            // 3. EGUNAK
+            // Days left
             Text(
-                text = "$daysLeft Egun",
+                text = daysText,
                 style = TextStyle(
                     color = ColorProvider(Color.White),
                     fontWeight = FontWeight.Medium,
                     fontStyle = FontStyle.Italic,
                     fontSize = 12.sp
                 ),
-                modifier = GlanceModifier.width(50.dp)
+                modifier = GlanceModifier.width(40.dp)
             )
         }
     }
 
-    // --- LOGIKA LAGUNTZAILEA ---
+    private fun getLocalizedContext(context: Context): Context {
+        val tag = context.getSharedPreferences(UserPreferencesRepository.PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(UserPreferencesRepository.LANGUAGE_TAG_KEY, "") ?: ""
+        if (tag.isEmpty()) return context
+        val locale = Locale.forLanguageTag(tag)
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        return context.createConfigurationContext(config)
+    }
+
     private fun calculateNextPayment(subscription: Subscription): Date {
         val calendar = Calendar.getInstance()
-        val today = Calendar.getInstance()
-        today.set(Calendar.HOUR_OF_DAY, 0); today.set(Calendar.MINUTE, 0); today.set(Calendar.SECOND, 0); today.set(Calendar.MILLISECOND, 0)
-
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+        }
         calendar.time = subscription.firstPaymentDate
-
         if (calendar.time.after(today.time)) return calendar.time
-
         while (calendar.time.before(today.time)) {
-            calendar.add(Calendar.MONTH, 1)
+            when (subscription.billingCycle) {
+                BillingCycle.WEEKLY -> calendar.add(Calendar.WEEK_OF_YEAR, 1)
+                BillingCycle.MONTHLY -> calendar.add(Calendar.MONTH, 1)
+                BillingCycle.ANNUAL -> calendar.add(Calendar.YEAR, 1)
+            }
         }
         return calendar.time
     }
 
     private fun calculateDaysLeft(nextDate: Date): Long {
-        val now = System.currentTimeMillis()
-        val diff = nextDate.time - now
+        val diff = nextDate.time - System.currentTimeMillis()
         return TimeUnit.MILLISECONDS.toDays(diff).coerceAtLeast(0)
     }
 }
 
 class RefreshAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        // 1. Egoera 'KARGATZEN' jarri
-        updateAppWidgetState(context, glanceId) { prefs ->
-            prefs[IsLoadingKey] = true
-        }
-        // Behartu Widget-a marraztera (Loading gurpila agertzeko)
+        updateAppWidgetState(context, glanceId) { prefs -> prefs[IsLoadingKey] = true }
         OroiWidget().update(context, glanceId)
-
-        // 2. Itxaron pixka bat (segundu bat eta erdi) animazioa ikusteko
         delay(1500)
-
-        // 3. Egoera 'AMAITUTA' jarri
-        updateAppWidgetState(context, glanceId) { prefs ->
-            prefs[IsLoadingKey] = false
-        }
-        // Behartu Widget-a marraztera (Botoia berriro agertzeko)
+        updateAppWidgetState(context, glanceId) { prefs -> prefs[IsLoadingKey] = false }
         OroiWidget().update(context, glanceId)
     }
 }

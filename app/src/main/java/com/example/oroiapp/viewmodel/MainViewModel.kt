@@ -7,6 +7,13 @@ import com.example.oroiapp.data.ThemeSetting
 import com.example.oroiapp.data.UserPreferencesRepository
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.model.Subscription
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -177,6 +184,25 @@ class MainViewModel(
     fun onBudgetChange(newBudget: Double) {
         userPrefs.saveMonthlyBudget(newBudget)
         _monthlyBudget.value = newBudget
+    }
+
+    suspend fun exportToCsv(context: Context): Uri? {
+        return try {
+            val subs = subscriptionDao.getAllSubscriptions().first()
+            if (subs.isEmpty()) return null
+            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            val csv = buildString {
+                appendLine("Name,Amount,Currency,Billing Cycle,First Payment Date")
+                subs.forEach { sub ->
+                    appendLine("\"${sub.name}\",${sub.amount},${sub.currency},${sub.billingCycle.name},${dateFormat.format(sub.firstPaymentDate)}")
+                }
+            }
+            val file = File(context.cacheDir, "oroi_subscriptions.csv")
+            file.writeText(csv)
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     val topExpensesChartData: Flow<List<ChartData>> = uiState.map { state ->

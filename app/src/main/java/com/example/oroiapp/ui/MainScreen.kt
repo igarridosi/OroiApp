@@ -59,8 +59,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -108,6 +111,8 @@ fun MainScreen(
     val dialogInput by viewModel.dialogUsernameInput.collectAsState()
     var showSettingsSheet by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     if (showSettingsSheet) {
         SettingsBottomSheet(
@@ -116,6 +121,27 @@ fun MainScreen(
             onThemeSelected = viewModel::changeTheme,
             onLanguageSelected = viewModel::changeLanguage,
             onUsernameUpdated = viewModel::updateUsername,
+            onExportCsv = {
+                showSettingsSheet = false
+                scope.launch {
+                    val uri = viewModel.exportToCsv(context)
+                    if (uri != null) {
+                        val shareIntent = android.content.Intent.createChooser(
+                            android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "text/csv"
+                                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            },
+                            context.getString(R.string.export_csv_share_title)
+                        )
+                        context.startActivity(shareIntent)
+                    } else {
+                        android.widget.Toast.makeText(
+                            context, context.getString(R.string.export_csv_empty), android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            },
             onDismiss = { showSettingsSheet = false }
         )
     }
@@ -369,6 +395,7 @@ fun FilterChipRow(
                        else MaterialTheme.colorScheme.onPrimary
             )
         }
+        Spacer(modifier = Modifier.weight(0.2f))
         IconButton(
             onClick = onStatsClick,
             modifier = Modifier

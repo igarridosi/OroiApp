@@ -105,6 +105,16 @@
     <string name="notifications_denied">Permiso denegado. No se enviarán recordatorios.</string>
     <string name="cancel_link_not_found">No se encontró enlace de cancelación para \'%1$s\'.</string>
 
+    <!-- Export -->
+    <string name="settings_data_section">Datos</string>
+    <string name="export_csv">Exportar como CSV</string>
+    <string name="export_csv_share_title">Compartir suscripciones</string>
+    <string name="export_csv_empty">No hay suscripciones para exportar.</string>
+
+    <!-- Widget -->
+    <string name="widget_days_left">%1$d d</string>
+    <string name="widget_empty_text">Sin próximos pagos</string>
+
     <!-- Search -->
     <string name="search_hint">Buscar suscripciones…</string>
     <string name="search_clear_description">Borrar búsqueda</string>
