@@ -7,38 +7,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.LinearProgressIndicator
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.state.getAppWidgetState
+import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.example.oroiapp.MainActivity
 import com.example.oroiapp.R
 import com.example.oroiapp.data.UserPreferencesRepository
@@ -46,28 +50,25 @@ import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.model.Subscription
 import com.example.oroiapp.viewmodel.OroiViewModelFactory
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.delay
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.glance.appwidget.CircularProgressIndicator
-import androidx.glance.appwidget.state.getAppWidgetState
-import androidx.glance.currentState
-import androidx.glance.state.PreferencesGlanceStateDefinition
-import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.text.FontStyle
-import androidx.glance.unit.ColorProvider
-import kotlinx.coroutines.delay
 
 val IsLoadingKey = booleanPreferencesKey("is_loading")
 
+// Widget header height + padding (dp) consumed before items
+private const val HEADER_HEIGHT_DP = 52f
+// Height each subscription row occupies (text + bar + spacing)
+private const val ITEM_HEIGHT_DP  = 42f
+
 class OroiWidget : GlanceAppWidget() {
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
-        val isLoading = prefs[IsLoadingKey] ?: false
+    // Exact mode: LocalSize.current reflects the actual widget dimensions
+    override val sizeMode = SizeMode.Exact
 
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
         val dao = OroiViewModelFactory.dao
         val allSubs = try {
             dao.getAllSubscriptions().first()
@@ -75,23 +76,21 @@ class OroiWidget : GlanceAppWidget() {
             emptyList()
         }
 
-        // Show all billing cycles sorted by days until next payment, top 4
-        val targetSubs = allSubs
+        // All billing cycles, sorted by urgency (fewest days first), take max 8
+        val sortedSubs = allSubs
             .map { sub ->
                 val nextDate = calculateNextPayment(sub)
-                val daysLeft = calculateDaysLeft(nextDate)
-                Triple(sub, nextDate, daysLeft)
+                Triple(sub, nextDate, calculateDaysLeft(nextDate))
             }
             .sortedBy { it.third }
-            .take(4)
+            .take(8)
 
-        // Localised strings from saved language preference
         val localCtx = getLocalizedContext(context)
         val emptyText = localCtx.getString(R.string.widget_empty_text)
 
         provideContent {
             GlanceTheme {
-                WidgetContent(targetSubs, isLoading, emptyText, localCtx)
+                WidgetContent(sortedSubs, emptyText, localCtx)
             }
         }
     }
@@ -100,67 +99,87 @@ class OroiWidget : GlanceAppWidget() {
     @Composable
     private fun WidgetContent(
         subs: List<Triple<Subscription, Date, Long>>,
-        isLoading: Boolean,
         emptyText: String,
         context: Context
     ) {
-        val BackgroundPurple = Color(0xFF7A40F2)
-        val DarkPurpleTrack = Color(0xFF4A2092)
-        val LightPurpleProgress = Color(0xFFD0C8FF)
+        val Purple    = Color(0xFF7A40F2)
+        val Track     = Color(0xFF4A2092)
+        val Divider   = Color(0x33FFFFFF)
+
+        // How many rows fit in the current widget height
+        val widgetHeight = LocalSize.current.height.value
+        val displayCount = ((widgetHeight - HEADER_HEIGHT_DP) / ITEM_HEIGHT_DP)
+            .toInt()
+            .coerceIn(1, subs.size.coerceAtLeast(1))
+        val visible = subs.take(displayCount)
 
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(BackgroundPurple)
-                .padding(12.dp)
+                .background(Purple)
+                .padding(horizontal = 14.dp, vertical = 10.dp)
                 .clickable(actionStartActivity<MainActivity>())
         ) {
-            Column(
-                modifier = GlanceModifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Header: logo + refresh button
+            Column(modifier = GlanceModifier.fillMaxSize()) {
+
+                // ── Compact header ───────────────────────────────────────
                 Row(
                     modifier = GlanceModifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = GlanceModifier.size(24.dp))
-                    Box(modifier = GlanceModifier.defaultWeight(), contentAlignment = Alignment.Center) {
-                        Image(
-                            provider = ImageProvider(R.drawable.oroi_logo_white),
-                            contentDescription = "Oroi",
-                            modifier = GlanceModifier.size(64.dp)
+                    Image(
+                        provider = ImageProvider(R.drawable.oroi_logo_white),
+                        contentDescription = "Oroi",
+                        modifier = GlanceModifier.size(22.dp)
+                    )
+                    Spacer(modifier = GlanceModifier.width(6.dp))
+                    Text(
+                        text = "oroi",
+                        style = TextStyle(
+                            color = ColorProvider(Color.White),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
                         )
-                    }
+                    )
+                    Spacer(modifier = GlanceModifier.defaultWeight())
                     Image(
                         provider = ImageProvider(android.R.drawable.ic_popup_sync),
                         contentDescription = "Refresh",
                         modifier = GlanceModifier
-                            .size(24.dp)
+                            .size(18.dp)
                             .clickable(actionRunCallback<RefreshAction>())
                     )
                 }
 
-                Spacer(modifier = GlanceModifier.height(12.dp))
+                Spacer(modifier = GlanceModifier.height(6.dp))
+                Spacer(
+                    modifier = GlanceModifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Divider)
+                )
+                Spacer(modifier = GlanceModifier.height(8.dp))
 
-                if (subs.isEmpty()) {
-                    Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                // ── Subscription rows ─────────────────────────────────────
+                if (visible.isEmpty()) {
+                    Box(
+                        modifier = GlanceModifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(
                             text = emptyText,
-                            style = TextStyle(color = ColorProvider(Color.White))
+                            style = TextStyle(
+                                color = ColorProvider(Color(0xAAFFFFFF)),
+                                fontSize = 12.sp
+                            )
                         )
                     }
                 } else {
-                    subs.forEach { (sub, _, daysLeft) ->
-                        SubscriptionRow(
-                            sub = sub,
-                            daysLeft = daysLeft,
-                            trackColor = DarkPurpleTrack,
-                            progressColor = LightPurpleProgress,
-                            context = context
-                        )
-                        Spacer(modifier = GlanceModifier.height(8.dp))
+                    visible.forEachIndexed { index, (sub, _, daysLeft) ->
+                        SubscriptionRow(sub = sub, daysLeft = daysLeft, trackColor = Track, context = context)
+                        if (index < visible.lastIndex) {
+                            Spacer(modifier = GlanceModifier.height(10.dp))
+                        }
                     }
                 }
             }
@@ -169,91 +188,86 @@ class OroiWidget : GlanceAppWidget() {
 
     @SuppressLint("RestrictedApi")
     @Composable
-    fun SubscriptionRow(
+    private fun SubscriptionRow(
         sub: Subscription,
         daysLeft: Long,
         trackColor: Color,
-        progressColor: Color,
         context: Context
     ) {
-        val cycleDays = when (sub.billingCycle) {
-            BillingCycle.WEEKLY -> 7f
-            BillingCycle.MONTHLY -> 30f
-            BillingCycle.ANNUAL -> 365f
-        }
-        // Progress fills as renewal approaches: 0 = just renewed, 1 = renews today
-        val progress = ((cycleDays - daysLeft) / cycleDays).coerceIn(0f, 1f)
+        // ── Progress: normalized to 30-day urgency window ─────────────────
+        // All billing cycles are comparable: bar fills as renewal approaches.
+        // daysLeft ≥ 30 → empty bar (no urgency); daysLeft = 0 → full bar.
+        val progress = (1f - daysLeft / 30f).coerceIn(0f, 1f)
 
-        val daysText = context.getString(R.string.widget_days_left, daysLeft)
+        // ── Urgency colors ────────────────────────────────────────────────
+        val (daysColor, barColor) = when {
+            daysLeft <= 3  -> Color(0xFFFF6B6B) to Color(0xFFFF6B6B) // red
+            daysLeft <= 7  -> Color(0xFFFFBF69) to Color(0xFFFFBF69) // amber
+            else           -> Color(0xAAFFFFFF) to Color(0xFFD0C8FF) // muted/purple
+        }
+
         val cycleTag = when (sub.billingCycle) {
-            BillingCycle.WEEKLY -> context.getString(R.string.billing_badge_weekly)
+            BillingCycle.WEEKLY  -> context.getString(R.string.billing_badge_weekly)
             BillingCycle.MONTHLY -> context.getString(R.string.billing_badge_monthly)
-            BillingCycle.ANNUAL -> context.getString(R.string.billing_badge_annual)
+            BillingCycle.ANNUAL  -> context.getString(R.string.billing_badge_annual)
         }
+        val amountText = "%s€/%s".format(
+            if (sub.amount == sub.amount.toLong().toDouble()) sub.amount.toLong().toString()
+            else String.format(Locale.US, "%.2f", sub.amount),
+            cycleTag
+        )
+        val daysText = context.getString(R.string.widget_days_left, daysLeft)
 
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Name
-            Text(
-                text = sub.name,
-                style = TextStyle(
-                    color = ColorProvider(Color.White),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 13.sp
-                ),
-                modifier = GlanceModifier.width(80.dp),
-                maxLines = 1
-            )
-
-            // Progress bar with amount overlay
-            Box(
-                modifier = GlanceModifier
-                    .defaultWeight()
-                    .height(20.dp),
-                contentAlignment = Alignment.CenterStart
+        Column(modifier = GlanceModifier.fillMaxWidth()) {
+            // Line 1: Name | Amount+cycle | Days
+            Row(
+                modifier = GlanceModifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                LinearProgressIndicator(
-                    progress = progress,
-                    modifier = GlanceModifier
-                        .fillMaxSize()
-                        .cornerRadius(8.dp),
-                    color = ColorProvider(progressColor),
-                    backgroundColor = ColorProvider(trackColor)
+                Text(
+                    text = sub.name,
+                    style = TextStyle(
+                        color = ColorProvider(Color.White),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    ),
+                    modifier = GlanceModifier.defaultWeight(),
+                    maxLines = 1
                 )
-                Box(
-                    modifier = GlanceModifier.fillMaxSize(),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Text(
-                        text = "${sub.amount.toInt()}€ $cycleTag",
-                        style = TextStyle(
-                            color = ColorProvider(Color.White),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = GlanceModifier.padding(end = 6.dp)
+                Text(
+                    text = amountText,
+                    style = TextStyle(
+                        color = ColorProvider(Color(0xCCFFFFFF)),
+                        fontSize = 10.sp
                     )
-                }
+                )
+                Spacer(modifier = GlanceModifier.width(10.dp))
+                Text(
+                    text = daysText,
+                    style = TextStyle(
+                        color = ColorProvider(daysColor),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
             }
 
-            Spacer(modifier = GlanceModifier.width(8.dp))
+            Spacer(modifier = GlanceModifier.height(4.dp))
 
-            // Days left
-            Text(
-                text = daysText,
-                style = TextStyle(
-                    color = ColorProvider(Color.White),
-                    fontWeight = FontWeight.Medium,
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 12.sp
-                ),
-                modifier = GlanceModifier.width(40.dp)
+            // Line 2: Thin urgency progress bar
+            LinearProgressIndicator(
+                progress = progress,
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .cornerRadius(4.dp),
+                color = ColorProvider(barColor),
+                backgroundColor = ColorProvider(trackColor)
             )
         }
     }
 
+    // Apply saved in-app language preference to the widget's string context
     private fun getLocalizedContext(context: Context): Context {
         val tag = context.getSharedPreferences(UserPreferencesRepository.PREFS_NAME, Context.MODE_PRIVATE)
             .getString(UserPreferencesRepository.LANGUAGE_TAG_KEY, "") ?: ""
@@ -274,18 +288,16 @@ class OroiWidget : GlanceAppWidget() {
         if (calendar.time.after(today.time)) return calendar.time
         while (calendar.time.before(today.time)) {
             when (subscription.billingCycle) {
-                BillingCycle.WEEKLY -> calendar.add(Calendar.WEEK_OF_YEAR, 1)
+                BillingCycle.WEEKLY  -> calendar.add(Calendar.WEEK_OF_YEAR, 1)
                 BillingCycle.MONTHLY -> calendar.add(Calendar.MONTH, 1)
-                BillingCycle.ANNUAL -> calendar.add(Calendar.YEAR, 1)
+                BillingCycle.ANNUAL  -> calendar.add(Calendar.YEAR, 1)
             }
         }
         return calendar.time
     }
 
-    private fun calculateDaysLeft(nextDate: Date): Long {
-        val diff = nextDate.time - System.currentTimeMillis()
-        return TimeUnit.MILLISECONDS.toDays(diff).coerceAtLeast(0)
-    }
+    private fun calculateDaysLeft(nextDate: Date): Long =
+        TimeUnit.MILLISECONDS.toDays(nextDate.time - System.currentTimeMillis()).coerceAtLeast(0)
 }
 
 class RefreshAction : ActionCallback {
