@@ -143,7 +143,7 @@ fun EditSubscriptionScreen(
             ) {
                 Text(
                     stringResource(R.string.save_changes),
-                    color = MaterialTheme.colorScheme.surface,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.SemiBold
                 )
             }

@@ -72,10 +72,11 @@
     <string name="amount_euros_label">Zenbatekoa (€)</string>
 
     <!-- Statistics Screen -->
-    <string name="top_expenses_title">Gastu Nagusiak</string>
+    <string name="top_expenses_title">Harpidetzak</string>
     <string name="no_data">Ez dago daturik erakusteko.</string>
     <string name="per_month">Hilean</string>
     <string name="top_5_subscriptions">Zure 5 Garestienak</string>
+    <string name="all_subscriptions_label">Harpidetza guztiak</string>
 
     <!-- Settings bottom sheet -->
     <string name="settings_title">Ezarpenak</string>

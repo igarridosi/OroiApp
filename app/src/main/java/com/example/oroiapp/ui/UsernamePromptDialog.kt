@@ -45,7 +45,7 @@ fun UsernamePromptDialog(
                 onClick = onSave,
                 enabled = currentInput.isNotBlank(),
             ) {
-                Text(stringResource(R.string.save), color = MaterialTheme.colorScheme.surface)
+                Text(stringResource(R.string.save), color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = null

@@ -15,55 +15,54 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AdsClick
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SettingsBrightness
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.oroiapp.R
-import com.example.oroiapp.data.ThemeSetting
-import com.example.oroiapp.model.BillingCycle
-import com.example.oroiapp.model.Subscription
-import com.example.oroiapp.ui.theme.OroiTheme
-import com.example.oroiapp.viewmodel.MainUiState
-import com.example.oroiapp.viewmodel.MainViewModel
-import com.example.oroiapp.viewmodel.SubscriptionFilter
-import java.text.SimpleDateFormat
-import java.util.*
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import com.example.oroiapp.R
+import com.example.oroiapp.data.ThemeSetting
+import com.example.oroiapp.model.BillingCycle
+import com.example.oroiapp.model.Subscription
+import com.example.oroiapp.viewmodel.MainUiState
+import com.example.oroiapp.viewmodel.MainViewModel
+import com.example.oroiapp.viewmodel.SubscriptionFilter
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 
 
 @Composable
@@ -84,14 +83,14 @@ fun MainHeader(username: String) {
             Text(
                 text = stringResource(R.string.welcome_greeting),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = username,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -160,13 +159,9 @@ fun MainScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // 1. Ertzetako padding-a (horizontala)
                     .padding(horizontal = 16.dp)
-                    // 2. Beheko barraren (navigation bar) altuera errespetatu
                     .windowInsetsPadding(WindowInsets.navigationBars)
-                    // 3. Tarte gehigarria botoiak barraren gainetik pixka bat flotatzeko (adibidez 16dp)
-                    .padding(bottom = 16.dp, top = 16.dp), // 'top' ere gehitu dut botoien gainean tarte bat uzteko
-
+                    .padding(bottom = 16.dp, top = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -178,7 +173,7 @@ fun MainScreen(
                     Icon(
                         Icons.Default.Settings,
                         contentDescription = stringResource(R.string.fab_settings),
-                        tint = MaterialTheme.colorScheme.surface
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -187,7 +182,11 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.fab_add_subscription), tint = MaterialTheme.colorScheme.surface)
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.fab_add_subscription),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         }
@@ -262,7 +261,10 @@ fun CostCarousel(uiState: MainUiState) {
             horizontalArrangement = Arrangement.Center
         ) {
             repeat(pagerState.pageCount) { index ->
-                val color = if (pagerState.currentPage == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError
+                val color = if (pagerState.currentPage == index)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.outlineVariant
                 Box(
                     modifier = Modifier
                         .padding(2.dp)
@@ -279,25 +281,27 @@ fun CostCarousel(uiState: MainUiState) {
 fun CostCard(title: String, amount: Double) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        shape = RoundedCornerShape(24.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(20.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.surface
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "€${"%.2f".format(amount)}",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.surface
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -349,10 +353,10 @@ fun FilterChipRow(
             onClick = { onFilterSelected(SubscriptionFilter.ALFABETIKOA) },
             label = { Text(stringResource(R.string.filter_alphabetical)) },
             colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                selectedLabelColor = MaterialTheme.colorScheme.surface,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                labelColor = MaterialTheme.colorScheme.onPrimary
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
         FilterChip(
@@ -360,10 +364,10 @@ fun FilterChipRow(
             onClick = { onFilterSelected(SubscriptionFilter.ORDAINKETA_DATA) },
             label = { Text(stringResource(R.string.filter_date)) },
             colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                selectedLabelColor = MaterialTheme.colorScheme.surface,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                labelColor = MaterialTheme.colorScheme.onPrimary
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
         FilterChip(
@@ -371,10 +375,10 @@ fun FilterChipRow(
             onClick = { onFilterSelected(SubscriptionFilter.PREZIOA) },
             label = { Text(stringResource(R.string.filter_price)) },
             colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                selectedLabelColor = MaterialTheme.colorScheme.surface,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                labelColor = MaterialTheme.colorScheme.onPrimary
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -383,16 +387,16 @@ fun FilterChipRow(
             modifier = Modifier
                 .size(40.dp)
                 .background(
-                    if (showSearch) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.primaryContainer,
+                    if (showSearch) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surfaceVariant,
                     CircleShape
                 )
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = stringResource(R.string.search_hint),
-                tint = if (showSearch) MaterialTheme.colorScheme.surface
-                       else MaterialTheme.colorScheme.onPrimary
+                tint = if (showSearch) MaterialTheme.colorScheme.onPrimary
+                       else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Spacer(modifier = Modifier.weight(0.2f))
@@ -400,12 +404,12 @@ fun FilterChipRow(
             onClick = onStatsClick,
             modifier = Modifier
                 .size(40.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
         ) {
             Icon(
                 imageVector = Icons.Default.BarChart,
                 contentDescription = stringResource(R.string.stats_button_description),
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -453,14 +457,14 @@ fun SubscriptionList(
                     imageVector = Icons.Default.LinkOff,
                     contentDescription = stringResource(R.string.empty_state_icon_description),
                     modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.empty_state_text),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -514,10 +518,10 @@ fun SubscriptionList(
                                 tintColor = MaterialTheme.colorScheme.onError
                             }
                             SwipeToDismissBoxValue.EndToStart -> {
-                                backgroundColor = MaterialTheme.colorScheme.onPrimary
+                                backgroundColor = MaterialTheme.colorScheme.primary
                                 icon = Icons.Default.Edit
                                 alignment = Alignment.CenterEnd
-                                tintColor = MaterialTheme.colorScheme.surface
+                                tintColor = MaterialTheme.colorScheme.onPrimary
                             }
                             else -> {
                                 backgroundColor = Color.Transparent
@@ -554,7 +558,8 @@ fun SubscriptionItem(subscription: Subscription) {
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {},
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box {
             Row(
@@ -569,19 +574,19 @@ fun SubscriptionItem(subscription: Subscription) {
                         subscription.name,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
                         stringResource(R.string.next_payment, dateFormat.format(nextPaymentDate)),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
                     )
                 }
                 Text(
                     text = "${subscription.amount} ${subscription.currency}",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
             BillingCycleBadge(
@@ -607,9 +612,9 @@ fun BillingCycleBadge(cycle: BillingCycle, modifier: Modifier = Modifier) {
         BillingCycle.ANNUAL -> stringResource(R.string.billing_badge_annual_desc)
     }
     val color = when (cycle) {
-        BillingCycle.WEEKLY -> MaterialTheme.colorScheme.onTertiary
-        BillingCycle.MONTHLY -> MaterialTheme.colorScheme.onTertiaryContainer
-        BillingCycle.ANNUAL -> MaterialTheme.colorScheme.onSecondary
+        BillingCycle.WEEKLY -> MaterialTheme.colorScheme.tertiary
+        BillingCycle.MONTHLY -> MaterialTheme.colorScheme.primary
+        BillingCycle.ANNUAL -> MaterialTheme.colorScheme.secondary
     }
     Box(
         contentAlignment = Alignment.Center,

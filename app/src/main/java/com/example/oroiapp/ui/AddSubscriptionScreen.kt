@@ -119,7 +119,7 @@ fun AddSubscriptionScreen(
             ) {
                 Text(
                     stringResource(R.string.save_subscription),
-                    color = MaterialTheme.colorScheme.surface,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.SemiBold
                 )
             }
