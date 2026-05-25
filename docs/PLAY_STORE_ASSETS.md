@@ -7,7 +7,7 @@
 | Application ID | `com.igarridosi.oroi` |
 | Keystore file | `oroi-release.jks` (project root) |
 | Key alias | `oroi-release-key` |
-| Password | see `keystore.properties` |
+| Password | `OroiRelease2025` (see `keystore.properties`) |
 | Validity | 10 000 days (~27 years) |
 
 > ⚠️ **Back up `oroi-release.jks` + `keystore.properties` to a safe location outside the repo**
