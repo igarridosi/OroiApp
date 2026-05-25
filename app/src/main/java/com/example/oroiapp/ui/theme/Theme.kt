@@ -10,63 +10,120 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.example.oroiapp.data.ThemeSetting
 
-// Kolore paleta ilunerako
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  DARK — Near-black with purple accent pops                  ║
+// ╚══════════════════════════════════════════════════════════════╝
 private val DarkColorScheme = darkColorScheme(
-    primary = MoreaArgia,             // Botoi nagusiak (kolore argia kontrastea egiteko)
-    onPrimary = MoreaArgia,           // Botoi nagusien gaineko testua (kolore iluna)
-    primaryContainer = MoreaDistiratsua,    // Bigarren mailako elementuak
+    // ── Primary ──
+    primary            = PurpleAccent,       // Buttons, FABs, active accents
+    onPrimary          = White,              // Text ON purple buttons
+    primaryContainer   = PurpleMuted,        // Chip/container fill (dark purple)
+    onPrimaryContainer = PurpleLight,        // Text on dark-purple containers
 
-    background = MoreaIluna,          // Pantailaren fondo orokorra
-    surface = MoreaIluna,             // Txartelen eta gainazalen fondoa
+    // ── Secondary ──
+    secondary            = PurpleGlow,
+    onSecondary          = DarkBackground,
+    secondaryContainer   = DarkSurfaceHigh,
+    onSecondaryContainer = TextPrimaryDark,
 
-    onBackground = Zuria,             // Fondoaren gaineko testu eta ikonoak
-    onSurface = Zuria,                // Txartelen gaineko testu eta ikonoak
+    // ── Tertiary ──
+    tertiary             = PurpleFuchsia,
+    onTertiary           = DarkBackground,
+    tertiaryContainer    = DarkSurfaceHigh,
+    onTertiaryContainer  = PurpleFuchsia,
 
-    error = GorriErrorea,
-    onError = Zuria,
+    // ── Background / Surface ──
+    background       = DarkBackground,       // Deepest layer
+    surface          = DarkSurface,          // Cards, sheets
+    surfaceVariant   = DarkSurfaceHigh,      // Chips, secondary panels
+    surfaceTint      = PurpleAccent,
 
-    onTertiary = MoreaIluna,
-    onTertiaryContainer = MoreaArroxa,
-    onSecondary = Grisa,
+    // ── On colors ──
+    onBackground     = TextPrimaryDark,
+    onSurface        = TextPrimaryDark,
+    onSurfaceVariant = TextSecondaryDark,
 
-    onTertiaryFixed = MoreaArgia,
-    onSecondaryFixed = MoreaArgia
+    // ── Outline ──
+    outline        = DarkOutline,
+    outlineVariant = DarkOutlineVar,
+
+    // ── Inverse ──
+    inverseSurface   = TextPrimaryDark,
+    inverseOnSurface = DarkBackground,
+    inversePrimary   = PurpleBright,
+
+    // ── Error ──
+    error            = ErrorRed,
+    onError          = White,
+    errorContainer   = Color(0xFF3B1212),
+    onErrorContainer = ErrorRed,
+
+    scrim = Color(0x99000000)
 )
 
-// --- MODU ARGIRAKO PALETA ---
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  LIGHT — Clean whites with purple brand accents             ║
+// ╚══════════════════════════════════════════════════════════════╝
 private val LightColorScheme = lightColorScheme(
-    primary = MoreaDistiratsua,       // Botoi nagusiak
-    onPrimary = MoreaIluna,                // Botoi nagusien gaineko testua
-    primaryContainer = MoreaArgia,          // Bigarren mailako elementuak
+    // ── Primary ──
+    primary            = PurpleBright,       // Brand purple
+    onPrimary          = White,              // White text on purple
+    primaryContainer   = Color(0xFFEDE7FF),  // Very light purple
+    onPrimaryContainer = Color(0xFF21005D),  // Dark purple text
 
-    background = ZuriHautsa,          // Pantailaren fondo orokorra
-    surface = Zuria,                  // Txartelen eta gainazalen fondoa
+    // ── Secondary ──
+    secondary            = PurpleFuchsia,
+    onSecondary          = White,
+    secondaryContainer   = Color(0xFFF3E8FF),
+    onSecondaryContainer = Color(0xFF2B0052),
 
-    onBackground = Beltza,            // Fondoaren gaineko testu eta ikonoak
-    onSurface = Beltza,               // Txartelen gaineko testu eta ikonoak
+    // ── Tertiary ──
+    tertiary             = Color(0xFF6750A4),
+    onTertiary           = White,
+    tertiaryContainer    = Color(0xFFE8DEF8),
+    onTertiaryContainer  = Color(0xFF1D192B),
 
-    error = GorriErrorea,
-    onError = Zuria,
+    // ── Background / Surface ──
+    background       = LightBackground,
+    surface          = LightSurface,
+    surfaceVariant   = LightSurfaceVar,
+    surfaceTint      = PurpleBright,
 
-    onTertiary = Grisa,
-    onTertiaryContainer = MoreaIluna,
-    onSecondary = MoreaDistiratsua,
+    // ── On colors ──
+    onBackground     = TextPrimaryLight,
+    onSurface        = TextPrimaryLight,
+    onSurfaceVariant = TextSecondaryLight,
 
-    onTertiaryFixed = MoreaIluna,
-    onSecondaryFixed = MoreaArgia
+    // ── Outline ──
+    outline        = LightOutline,
+    outlineVariant = Color(0xFFE0DDE5),
+
+    // ── Inverse ──
+    inverseSurface   = Color(0xFF313033),
+    inverseOnSurface = Color(0xFFF4EFF4),
+    inversePrimary   = PurpleLight,
+
+    // ── Error ──
+    error            = ErrorRedBright,
+    onError          = White,
+    errorContainer   = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002),
+
+    scrim = Color(0x66000000)
 )
 
 
 @Composable
 fun OroiTheme(
     themeSetting: ThemeSetting = ThemeSetting.SYSTEM,
-    dynamicColor: Boolean = false, // Zure app-ak nortasun handia du, hobe kolore dinamikoak desgaitzea
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeSetting) {
@@ -83,11 +140,13 @@ fun OroiTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            // Status bar matches the background — seamless
+            window.statusBarColor = colorScheme.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

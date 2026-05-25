@@ -72,10 +72,11 @@
     <string name="amount_euros_label">Importe (€)</string>
 
     <!-- Statistics Screen -->
-    <string name="top_expenses_title">Gastos principales</string>
+    <string name="top_expenses_title">Suscripciones</string>
     <string name="no_data">No hay datos para mostrar.</string>
     <string name="per_month">Al mes</string>
     <string name="top_5_subscriptions">Tus 5 más caras</string>
+    <string name="all_subscriptions_label">Todas las suscripciones</string>
 
     <!-- Settings bottom sheet -->
     <string name="settings_title">Ajustes</string>

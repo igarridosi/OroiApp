@@ -72,10 +72,11 @@
     <string name="amount_euros_label">Amount (€)</string>
 
     <!-- Statistics Screen -->
-    <string name="top_expenses_title">Top Expenses</string>
+    <string name="top_expenses_title">Subscriptions</string>
     <string name="no_data">No data to display.</string>
     <string name="per_month">Per month</string>
     <string name="top_5_subscriptions">Your 5 Most Expensive</string>
+    <string name="all_subscriptions_label">All subscriptions</string>
 
     <!-- Settings bottom sheet -->
     <string name="settings_title">Settings</string>

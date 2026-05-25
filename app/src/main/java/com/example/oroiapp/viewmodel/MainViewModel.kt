@@ -205,7 +205,7 @@ class MainViewModel(
         }
     }
 
-    val topExpensesChartData: Flow<List<ChartData>> = uiState.map { state ->
+    val allExpensesChartData: Flow<List<ChartData>> = uiState.map { state ->
         state.subscriptions
             .map { sub ->
                 val monthlyValue = when (sub.billingCycle) {
@@ -216,7 +216,6 @@ class MainViewModel(
                 sub to monthlyValue
             }
             .sortedByDescending { it.second }
-            .take(5)
             .map { (sub, monthlyValue) -> ChartData(label = sub.name, value = monthlyValue.toFloat()) }
     }
 }

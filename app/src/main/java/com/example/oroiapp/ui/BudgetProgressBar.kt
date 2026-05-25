@@ -62,18 +62,18 @@ fun BudgetProgressBar(
                         Icons.Default.Edit,
                         contentDescription = stringResource(R.string.edit_description),
                         modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onTertiaryFixed
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.monthly_budget_label),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiaryFixed
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
@@ -93,7 +93,7 @@ fun BudgetProgressBar(
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
                 color = progressColor,
-                trackColor = MaterialTheme.colorScheme.primaryContainer,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
             if (currentMonthlyCost > budgetLimit) {
                 Text(
