@@ -586,7 +586,7 @@ fun SubscriptionItem(subscription: Subscription) {
                     text = "${subscription.amount} ${subscription.currency}",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
             BillingCycleBadge(
