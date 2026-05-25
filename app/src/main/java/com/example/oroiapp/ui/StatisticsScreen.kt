@@ -37,8 +37,8 @@ import com.example.oroiapp.viewmodel.ChartData
 import com.example.oroiapp.viewmodel.MainViewModel
 import kotlin.math.atan2
 
-/** Gap in degrees between each donut segment. */
-private const val SEGMENT_GAP_DEG = 2.5f
+/** Angular gap in degrees that separates each donut segment. */
+private const val SEGMENT_GAP_DEG = 2.0f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,11 +137,11 @@ fun InteractivePieChart(
         val isSelected = index == selectedIndex
         val isAnySelected = selectedIndex != -1
         val originalColor = ChartPalette[index % ChartPalette.size]
-        val dimmedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-        val targetColor = if (isAnySelected && !isSelected) dimmedColor else originalColor
+        // Fade non-selected segments to their own color at low opacity — no gray blobs
+        val targetColor = if (isAnySelected && !isSelected) originalColor.copy(alpha = 0.22f) else originalColor
         animateColorAsState(
             targetValue = targetColor,
-            animationSpec = tween(durationMillis = 350),
+            animationSpec = tween(durationMillis = 300),
             label = "color_$index"
         )
     }
@@ -190,10 +190,10 @@ fun InteractivePieChart(
 
                 drawArc(
                     color = color,
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle,
+                    startAngle = startAngle + 0.4f,      // inset half-gap for clean separation
+                    sweepAngle = sweepAngle - 0.8f,      // trim both ends for flat gap
                     useCenter = false,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
                 )
                 startAngle += sweepAngle + SEGMENT_GAP_DEG
             }
@@ -266,10 +266,10 @@ fun ChartLegend(
 
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 ),
                 shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -291,7 +291,7 @@ fun ChartLegend(
                         text = item.label,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -301,7 +301,7 @@ fun ChartLegend(
                     Text(
                         text = "${"%.1f".format(pct)}%",
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
                         modifier = Modifier.padding(end = 12.dp)
                     )
 
