@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push *)",
+      "Bash(where gh *)",
+      "Bash(git add *)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(./gradlew assembleDebug --no-daemon)",
+      "Bash(git commit -m ' *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Java\\\\jdk-21\\\\bin\\\\keytool.exe\" -list -keystore \"E:\\\\PAAG25_Zubiri\\\\AndroidProjects\\\\OroiApp\\\\oroi-release.jks\" -storepass \"OroiRelease2025\")"
+    ]
+  }
+}

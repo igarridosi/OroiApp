@@ -7,7 +7,7 @@
 | Application ID | `com.igarridosi.oroi` |
 | Keystore file | `oroi-release.jks` (project root) |
 | Key alias | `oroi-release-key` |
-| Password | see `keystore.properties` |
+| Password | `OroiRelease2025` (see `keystore.properties`) |
 | Validity | 10 000 days (~27 years) |
 
 > ⚠️ **Back up `oroi-release.jks` + `keystore.properties` to a safe location outside the repo**
@@ -92,7 +92,7 @@ oroi works entirely offline. No account required. No data is collected or shared
 Everything stays on your device.
 
 ---
-Privacy Policy: https://igarridosi.github.io/OroiApp/privacy-policy.html
+Privacy Policy: https://oroi-privacy.netlify.app/privacy-policy.html
 ```
 
 ### Content rating
@@ -109,7 +109,7 @@ Complete the IARC questionnaire in Play Console — select:
 - [ ] Create app in Google Play Console (paid $25 one-time)
 - [ ] Fill in store listing (title, description, screenshots, icon, feature graphic)
 - [ ] Upload `app-release.aab`
-- [ ] Set Privacy Policy URL: `https://igarridosi.github.io/OroiApp/privacy-policy.html`
+- [ ] Set Privacy Policy URL: `https://oroi-privacy.netlify.app/privacy-policy.html`
 - [ ] Complete content rating questionnaire
 - [ ] Set category: Finance
 - [ ] Set countries: All countries (or specific ones)

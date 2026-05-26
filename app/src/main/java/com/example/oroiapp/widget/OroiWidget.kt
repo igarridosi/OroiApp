@@ -14,6 +14,7 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.LinearProgressIndicator
@@ -117,14 +118,14 @@ class OroiWidget : GlanceAppWidget() {
                     Image(
                         provider = ImageProvider(R.drawable.oroi_logo_white),
                         contentDescription = "Oroi",
-                        modifier = GlanceModifier.size(28.dp)
+                        modifier = GlanceModifier.size(58.dp)
                     )
                     Spacer(modifier = GlanceModifier.width(8.dp))
                     Text(
                         text = "oroi",
                         style = TextStyle(
                             color = ColorProvider(Color.White),
-                            fontSize = 18.sp,
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
                         )
                     )
