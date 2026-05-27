@@ -3,8 +3,6 @@ package com.example.oroiapp.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +23,6 @@ fun SettingsBottomSheet(
     onLanguageSelected: (String) -> Unit,
     onUsernameUpdated: (String) -> Unit,
     onExportCsv: () -> Unit,
-    onTestNotification: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -132,34 +129,6 @@ fun SettingsBottomSheet(
                 )
             }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
-
-            // ── DEBUG / TEST SECTION ──────────────────────────────────────
-            // TODO: Remove this section before final Play Store release
-            SectionLabel("🧪 Debug")
-            Spacer(modifier = Modifier.height(8.dp))
-            var testSent by remember { mutableStateOf(false) }
-            OutlinedButton(
-                onClick = {
-                    onTestNotification()
-                    testSent = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    if (testSent) "Notification sent! Wait 15 s…" else "Test notification (15 s)",
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
         }
     }
 }

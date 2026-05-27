@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -12,8 +13,10 @@ import androidx.work.WorkerParameters
 import com.example.oroiapp.MainActivity
 import com.example.oroiapp.OroiApplication
 import com.example.oroiapp.R
+import com.example.oroiapp.data.UserPreferencesRepository
 import com.example.oroiapp.model.BillingCycle
 import com.example.oroiapp.viewmodel.OroiViewModelFactory
+import java.util.Locale
 
 class ReminderWorker(
     private val context: Context,
@@ -28,14 +31,15 @@ class ReminderWorker(
         val dao = OroiViewModelFactory.dao
         val subscription = dao.getSubscriptionById(subscriptionId) ?: return Result.failure()
 
-        // Build notification content
+        // Build notification content using the user's selected app language
+        val localizedCtx = getLocalizedContext()
         val annualCost = when (subscription.billingCycle) {
             BillingCycle.WEEKLY  -> subscription.amount * 52
             BillingCycle.MONTHLY -> subscription.amount * 12
             BillingCycle.ANNUAL  -> subscription.amount
         }
-        val title = context.getString(R.string.notification_title, subscription.name)
-        val content = context.getString(R.string.notification_content, annualCost)
+        val title = localizedCtx.getString(R.string.notification_title, subscription.name)
+        val content = localizedCtx.getString(R.string.notification_content, annualCost)
 
         showNotification(subscriptionId, title, content)
 
@@ -69,5 +73,24 @@ class ReminderWorker(
         } catch (e: SecurityException) {
             e.printStackTrace()
         }
+    }
+
+    /**
+     * Returns a context configured with the locale the user has selected inside
+     * the app (stored in SharedPreferences). Falls back to the system context if
+     * no language preference has been saved yet.
+     */
+    private fun getLocalizedContext(): Context {
+        val prefs = context.getSharedPreferences(
+            UserPreferencesRepository.PREFS_NAME, Context.MODE_PRIVATE
+        )
+        val tag = prefs.getString(UserPreferencesRepository.LANGUAGE_TAG_KEY, "") ?: ""
+        if (tag.isEmpty()) return context
+
+        val locale = Locale.forLanguageTag(tag)
+        val config = Configuration(context.resources.configuration).apply {
+            setLocale(locale)
+        }
+        return context.createConfigurationContext(config)
     }
 }
