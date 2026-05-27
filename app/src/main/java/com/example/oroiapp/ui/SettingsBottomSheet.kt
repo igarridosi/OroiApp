@@ -128,6 +128,7 @@ fun SettingsBottomSheet(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+
         }
     }
 }

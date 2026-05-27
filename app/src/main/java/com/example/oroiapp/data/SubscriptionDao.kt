@@ -19,7 +19,7 @@ interface SubscriptionDao {
 
     // CRUD Funtzioak
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun add(subscription: Subscription)
+    suspend fun add(subscription: Subscription): Long
     @Update
     suspend fun update(subscription: Subscription)
     @Delete

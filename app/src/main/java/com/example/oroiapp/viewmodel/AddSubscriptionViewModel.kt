@@ -52,8 +52,10 @@ class AddEditViewModel(
                 billingCycle = state.billingCycle,
                 firstPaymentDate = state.firstPaymentDate
             )
-            subscriptionDao.add(newSubscription)
-            NotificationScheduler.scheduleReminder(application.applicationContext, newSubscription)
+            // add() now returns the real auto-generated row ID
+            val insertedId = subscriptionDao.add(newSubscription)
+            val savedSubscription = newSubscription.copy(id = insertedId.toInt())
+            NotificationScheduler.scheduleReminder(application.applicationContext, savedSubscription)
             OroiWidget().updateAll(application.applicationContext)
             true
         } catch (e: Exception) {
