@@ -28,16 +28,20 @@ class ReminderWorker(
         val dao = OroiViewModelFactory.dao
         val subscription = dao.getSubscriptionById(subscriptionId) ?: return Result.failure()
 
+        // Build notification content
         val annualCost = when (subscription.billingCycle) {
-            BillingCycle.WEEKLY -> subscription.amount * 52
+            BillingCycle.WEEKLY  -> subscription.amount * 52
             BillingCycle.MONTHLY -> subscription.amount * 12
-            BillingCycle.ANNUAL -> subscription.amount
+            BillingCycle.ANNUAL  -> subscription.amount
         }
-
         val title = context.getString(R.string.notification_title, subscription.name)
         val content = context.getString(R.string.notification_content, annualCost)
 
         showNotification(subscriptionId, title, content)
+
+        // Reschedule for the next billing cycle so reminders keep coming automatically
+        NotificationScheduler.scheduleReminder(context, subscription)
+
         return Result.success()
     }
 
