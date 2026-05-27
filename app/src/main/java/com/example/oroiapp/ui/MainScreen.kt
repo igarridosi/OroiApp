@@ -59,6 +59,7 @@ import com.example.oroiapp.model.Subscription
 import com.example.oroiapp.viewmodel.MainUiState
 import com.example.oroiapp.viewmodel.MainViewModel
 import com.example.oroiapp.viewmodel.SubscriptionFilter
+import com.example.oroiapp.worker.NotificationScheduler
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -140,6 +141,11 @@ fun MainScreen(
                         ).show()
                     }
                 }
+            },
+            onTestNotification = {
+                // Use the first subscription's id, or 1 as fallback
+                val testId = uiState.subscriptions.firstOrNull()?.id ?: 1
+                NotificationScheduler.scheduleTestReminder(context, testId)
             },
             onDismiss = { showSettingsSheet = false }
         )

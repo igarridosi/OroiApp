@@ -81,6 +81,27 @@ object NotificationScheduler {
         WorkManager.getInstance(context).cancelAllWorkByTag("reminder_$subscriptionId")
     }
 
+    /**
+     * TEST ONLY — fires a real notification in 15 seconds using subscription id=1
+     * (or whichever id is passed). Remove before production release.
+     */
+    fun scheduleTestReminder(context: Context, subscriptionId: Int) {
+        val workTag = "test_reminder_$subscriptionId"
+        WorkManager.getInstance(context).cancelAllWorkByTag(workTag)
+
+        val inputData = Data.Builder()
+            .putInt("SUBSCRIPTION_ID", subscriptionId)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
+            .setInitialDelay(15, TimeUnit.SECONDS)
+            .setInputData(inputData)
+            .addTag(workTag)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(workRequest)
+    }
+
     private fun Calendar.advanceByCycle(cycle: BillingCycle) {
         when (cycle) {
             BillingCycle.WEEKLY  -> add(Calendar.WEEK_OF_YEAR, 1)
