@@ -33,7 +33,7 @@ Reminders that alert you before a renewal charges your account.
 ### 🧩 Home Screen Widget
 Quick glance at upcoming renewals without opening the app.
 
-![Widget](./screenshots/widget.png)
+![Widget](./screenshots/widget_snap.png)
 
 ## ✨ Features
 
