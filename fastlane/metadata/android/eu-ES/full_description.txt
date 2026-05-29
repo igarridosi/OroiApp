@@ -1,0 +1,20 @@
+oroi harpidetzen kudeatzaile garden eta minimalista bat da, zure ordainketa errepikakorretan kontrola mantentzen laguntzen dizuna — ustekabeko karguak ez hartzeko.
+
+EZAUGARRIAK
+
+• Zure harpidetzak leku bakarrean kontrolatu — streaming, software, fitness eta gehiago
+• Hileko, urteko eta eguneko gastua begirada batean ikusi
+• Hileko gastuaren banaketa bisuala donut-grafiko batekin
+• Berritzeko gogorarazpenak — jakinarazpen bat jaso kargu bakoitzaren 2 egun lehenago
+• Hileko aurrekontua barra bisualekin
+• Hasierako pantailako widget-a hurrengo berritzeekin
+• Zerbitzu ezagunetarako zuzeneko ezzeztapen estekak
+• Harpidetzak CSV formatuan esportatu
+• Gai ilun eta argi osoa
+• Ingelesez, gaztelaniaz eta euskaraz eskuragarri
+
+PRIBATUTASUNA LEHENIK
+
+oroi guztiz konexiorik gabe funtzionatzen du. Konturik gabe, datu bilketarik gabe. Internet baimenik gabe. Dena zure gailuan geratzen da.
+
+Pribatutasun politika: https://oroi-privacy.netlify.app/privacy-policy.html

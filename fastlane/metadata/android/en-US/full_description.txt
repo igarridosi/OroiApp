@@ -1,0 +1,20 @@
+oroi is a clean, minimal subscription tracker that helps you stay on top of every recurring payment — so you never get surprised by an unexpected charge again.
+
+FEATURES
+
+• Track all your subscriptions in one place — streaming, software, fitness, and more
+• See your total monthly, annual, and daily spend at a glance
+• Visual donut chart showing where your money goes each month
+• Renewal reminders — get notified 2 days before any subscription charges you
+• Monthly budget with a live progress bar so you know when you're overspending
+• Home screen widget showing upcoming renewals at a glance
+• Quick-access cancellation links for popular services
+• Export your subscription list as CSV
+• Full dark mode and light mode support
+• Available in English, Spanish, and Basque
+
+PRIVACY FIRST
+
+oroi works entirely offline. No account required. No data is collected or shared. No internet permission is requested. Everything stays on your device.
+
+Privacy Policy: https://oroi-privacy.netlify.app/privacy-policy.html

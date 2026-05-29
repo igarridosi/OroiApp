@@ -1,0 +1,20 @@
+oroi es un gestor de suscripciones limpio y minimalista que te ayuda a controlar todos tus pagos recurrentes — para que nunca te sorprenda un cargo inesperado.
+
+CARACTERÍSTICAS
+
+• Controla todas tus suscripciones en un solo lugar — streaming, software, fitness y más
+• Visualiza tu gasto mensual, anual y diario de un vistazo
+• Gráfico de anillo con el desglose visual de tu gasto mensual
+• Recordatorios de renovación — recibe una notificación 2 días antes de cada cargo
+• Presupuesto mensual con barra de progreso en tiempo real
+• Widget para la pantalla de inicio con las próximas renovaciones
+• Enlaces directos de cancelación para los servicios más populares
+• Exporta tu lista de suscripciones en CSV
+• Modo oscuro y modo claro completos
+• Disponible en inglés, español y euskera
+
+PRIVACIDAD PRIMERO
+
+oroi funciona completamente sin conexión. Sin cuenta, sin datos recopilados ni compartidos. Sin permiso de internet. Todo permanece en tu dispositivo.
+
+Política de privacidad: https://oroi-privacy.netlify.app/privacy-policy.html
