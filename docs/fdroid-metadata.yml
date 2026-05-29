@@ -1,0 +1,46 @@
+Categories:
+  - Money
+
+License: MIT
+
+AuthorName: Ibai Garrido
+SourceCode: https://github.com/igarridosi/OroiApp
+IssueTracker: https://github.com/igarridosi/OroiApp/issues
+
+AutoName: oroi
+
+Description: |-
+  oroi (from the Basque word <i>oroitu</i>, meaning "to remember") is a minimal,
+  clean subscription tracker that helps you stay on top of every recurring
+  payment — so you never get surprised by an unexpected charge again.
+
+  <b>Features</b>
+
+  * Track all your subscriptions in one place (streaming, software, fitness, and more)
+  * See your total monthly, annual, and daily spend at a glance
+  * Visual donut chart showing where your money goes each month
+  * Renewal reminders — get notified 2 days before any subscription charges you
+  * Monthly budget with a live progress bar
+  * Home screen widget showing upcoming renewals
+  * Quick-access cancellation links for popular services
+  * Export your subscription list as CSV
+  * Full dark mode and light mode support
+  * Available in English, Spanish, and Basque
+
+  <b>Privacy first</b>
+
+  oroi works entirely offline. No account required. No data is collected or
+  shared. No internet permission is requested. Everything stays on your device.
+
+Builds:
+  - versionName: '1.0.1'
+    versionCode: 2
+    commit: v1.0.1
+    subdir: app
+    gradle:
+      - release
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.0.1'
+CurrentVersionCode: 2
